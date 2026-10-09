@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- 只允許載入同源檔案：零外部請求，也擋下注入的外部腳本 -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>教師寧靜</title>
+  <meta name="theme-color" content="#5b7a6e">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="教師寧靜">
+  <link rel="stylesheet" href="css/base.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>教師寧靜</h1>
+    <nav aria-label="主選單" id="nav">
+      <button type="button" data-view="home" aria-current="page">首頁</button>
+      <button type="button" data-view="notes">工作紀要</button>
+      <button type="button" data-view="settings">設定</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 寧靜模式首頁 -->
+    <section id="view-home" data-mode="quiet" aria-labelledby="h-home">
+      <h2 id="h-home" class="visually-hidden">寧靜模式</h2>
+      <section id="countdown" aria-labelledby="h-countdown"><h3 id="h-countdown">時光倒數</h3></section>
+      <section id="quote" aria-labelledby="h-quote"><h3 id="h-quote">一日一句</h3></section>
+      <section id="audio" aria-labelledby="h-audio"><h3 id="h-audio">白噪音</h3></section>
+    </section>
+
+    <section id="view-notes" hidden aria-labelledby="h-notes">
+      <h2 id="h-notes">工作紀要</h2>
+    </section>
+
+    <section id="view-settings" hidden aria-labelledby="h-settings">
+      <h2 id="h-settings">設定</h2>
+
+      <section aria-labelledby="h-backup">
+        <h3 id="h-backup">備份</h3>
+        <p class="warn">所有資料只存在這台裝置的瀏覽器裡。清除瀏覽器資料會遺失內容，請定期匯出備份。</p>
+        <p>
+          <button type="button" id="btn-export">匯出備份</button>
+          <label class="file-btn">匯入備份
+            <input type="file" id="file-import" accept="application/json,.json">
+          </label>
+        </p>
+        <p id="storage-usage" class="muted"></p>
+      </section>
+    </section>
+
+    <!-- 地獄模式（M3） -->
+    <section id="view-hell" data-mode="hell" hidden aria-labelledby="h-hell">
+      <h2 id="h-hell">地獄模式</h2>
+    </section>
+  </main>
+
+  <dialog id="dlg-import" aria-labelledby="h-dlg-import">
+    <form method="dialog">
+      <h3 id="h-dlg-import">確認匯入備份</h3>
+      <p>匯入後會<strong>覆蓋</strong>這台裝置上的所有資料。</p>
+      <ul id="import-summary"></ul>
+      <p>
+        <button value="cancel">取消</button>
+        <button value="ok" id="btn-import-ok">確認覆蓋</button>
+      </p>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

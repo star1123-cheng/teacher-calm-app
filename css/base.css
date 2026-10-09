@@ -1,0 +1,17 @@
+/* 功能骨架用的最少樣式；正式視覺於 UI 套版階段處理 */
+:root { color-scheme: light dark; }
+body { font-family: system-ui, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.6; margin: 0 auto; max-width: 48rem; padding: 0 1rem 4rem; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; }
+button { min-height: 2.75rem; }
+:focus-visible { outline: 3px solid Highlight; outline-offset: 2px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.muted { opacity: .75; }
+.warn { border-left: 4px solid currentColor; padding-left: .5rem; }
+.file-btn { display: inline-block; border: 1px solid; padding: .5rem .75rem; cursor: pointer; }
+.file-btn input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.file-btn:focus-within { outline: 3px solid Highlight; }
+#toast { position: fixed; left: 1rem; right: 1rem; bottom: 1rem; }
+#toast:not(:empty) { padding: .75rem 1rem; background: Canvas; border: 2px solid; }
+.error { color: #b00020; }
+progress { width: 100%; }
