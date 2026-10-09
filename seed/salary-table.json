@@ -1,0 +1,287 @@
+{
+ "version": "113-01-01",
+ "source": "公立高級中等以下學校教師及幼兒園教保服務人員薪額一覽表（全國教師工會總聯合會 113 年 1 月 1 日版）",
+ "note": "homeroom 以使用者所述現行 4000 為準（PDF 為 3000）；十三級 450 點 40650 與相鄰級距落差大，請核對原表",
+ "levels": [
+  {
+   "level": 1,
+   "label": "一級",
+   "points": 770,
+   "monthly": 61660
+  },
+  {
+   "level": 2,
+   "label": "二級",
+   "points": 740,
+   "monthly": 58480
+  },
+  {
+   "level": 3,
+   "label": "三級",
+   "points": 710,
+   "monthly": 57740
+  },
+  {
+   "level": 4,
+   "label": "四級",
+   "points": 680,
+   "monthly": 55510
+  },
+  {
+   "level": 5,
+   "label": "五級",
+   "points": 650,
+   "monthly": 54020
+  },
+  {
+   "level": 6,
+   "label": "六級",
+   "points": 625,
+   "monthly": 52540
+  },
+  {
+   "level": 7,
+   "label": "七級",
+   "points": 600,
+   "monthly": 51050
+  },
+  {
+   "level": 8,
+   "label": "八級",
+   "points": 575,
+   "monthly": 49570
+  },
+  {
+   "level": 9,
+   "label": "九級",
+   "points": 550,
+   "monthly": 48080
+  },
+  {
+   "level": 10,
+   "label": "一〇級",
+   "points": 525,
+   "monthly": 46590
+  },
+  {
+   "level": 11,
+   "label": "一一級",
+   "points": 500,
+   "monthly": 45110
+  },
+  {
+   "level": 12,
+   "label": "一二級",
+   "points": 475,
+   "monthly": 43620
+  },
+  {
+   "level": 13,
+   "label": "一三級",
+   "points": 450,
+   "monthly": 40650
+  },
+  {
+   "level": 14,
+   "label": "一四級",
+   "points": 430,
+   "monthly": 39540
+  },
+  {
+   "level": 15,
+   "label": "一五級",
+   "points": 410,
+   "monthly": 38420
+  },
+  {
+   "level": 16,
+   "label": "一六級",
+   "points": 390,
+   "monthly": 37310
+  },
+  {
+   "level": 17,
+   "label": "一七級",
+   "points": 370,
+   "monthly": 36190
+  },
+  {
+   "level": 18,
+   "label": "一八級",
+   "points": 350,
+   "monthly": 35080
+  },
+  {
+   "level": 19,
+   "label": "一九級",
+   "points": 330,
+   "monthly": 33960
+  },
+  {
+   "level": 20,
+   "label": "二〇級",
+   "points": 310,
+   "monthly": 32850
+  },
+  {
+   "level": 21,
+   "label": "二一級",
+   "points": 290,
+   "monthly": 31730
+  },
+  {
+   "level": 22,
+   "label": "二二級",
+   "points": 275,
+   "monthly": 30620
+  },
+  {
+   "level": 23,
+   "label": "二三級",
+   "points": 260,
+   "monthly": 29500
+  },
+  {
+   "level": 24,
+   "label": "二四級",
+   "points": 245,
+   "monthly": 28390
+  },
+  {
+   "level": 25,
+   "label": "二五級",
+   "points": 230,
+   "monthly": 27280
+  },
+  {
+   "level": 26,
+   "label": "二六級",
+   "points": 220,
+   "monthly": 26530
+  },
+  {
+   "level": 27,
+   "label": "二七級",
+   "points": 210,
+   "monthly": 25790
+  },
+  {
+   "level": 28,
+   "label": "二八級",
+   "points": 200,
+   "monthly": 25050
+  },
+  {
+   "level": 29,
+   "label": "二九級",
+   "points": 190,
+   "monthly": 24300
+  },
+  {
+   "level": 30,
+   "label": "三〇級",
+   "points": 180,
+   "monthly": 23560
+  },
+  {
+   "level": 31,
+   "label": "三一級",
+   "points": 170,
+   "monthly": 22820
+  },
+  {
+   "level": 32,
+   "label": "三二級",
+   "points": 160,
+   "monthly": 22070
+  },
+  {
+   "level": 33,
+   "label": "三三級",
+   "points": 150,
+   "monthly": 21330
+  },
+  {
+   "level": 34,
+   "label": "三四級",
+   "points": 140,
+   "monthly": 20590
+  },
+  {
+   "level": 35,
+   "label": "三五級",
+   "points": 130,
+   "monthly": 19850
+  },
+  {
+   "level": 36,
+   "label": "三六級",
+   "points": 120,
+   "monthly": 19100
+  }
+ ],
+ "researchAllowance": [
+  {
+   "minPoints": 475,
+   "amount": 34730
+  },
+  {
+   "minPoints": 350,
+   "maxPoints": 450,
+   "amount": 29260
+  },
+  {
+   "minPoints": 245,
+   "maxPoints": 330,
+   "amount": 25780
+  },
+  {
+   "maxPoints": 230,
+   "amount": 22400
+  }
+ ],
+ "homeroomAllowance": {
+  "amount": 4000,
+  "pdfAmount": 3000
+ },
+ "leaderAllowance": [
+  {
+   "minPoints": 290,
+   "amount": 5750
+  },
+  {
+   "minPoints": 245,
+   "maxPoints": 275,
+   "amount": 4720
+  },
+  {
+   "maxPoints": 230,
+   "amount": 4190
+  }
+ ],
+ "education": {
+  "phd": {
+   "label": "博士",
+   "maxBasePoints": 550,
+   "maxSeniorityPoints": 680,
+   "startPoints": 330
+  },
+  "master": {
+   "label": "碩士",
+   "maxBasePoints": 525,
+   "maxSeniorityPoints": 650,
+   "startPoints": 245
+  },
+  "credits40": {
+   "label": "研究所40學分班",
+   "maxBasePoints": 500,
+   "maxSeniorityPoints": 625
+  },
+  "bachelor": {
+   "label": "大學",
+   "maxBasePoints": 450,
+   "maxSeniorityPoints": 625,
+   "startPoints": 190
+  }
+ }
+}

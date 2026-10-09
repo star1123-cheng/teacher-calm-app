@@ -1,0 +1,23 @@
+# 機敏資料（絕對不可進入 Git）
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*credentials*.json
+*serviceAccountKey*.json
+.clasprc.json
+
+# 套件與建置產物
+node_modules/
+dist/
+
+# 壓縮檔（設計稿 zip 16 MB、計畫書 zip 已解壓）
+*.zip
+
+# 系統與暫存
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+tests/tmp/
