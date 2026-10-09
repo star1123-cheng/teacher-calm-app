@@ -1,6 +1,6 @@
 // Service worker：快取所有靜態檔，斷網可完整使用。
 // 修改任何檔案後請把 VERSION 加 1，讓使用者裝置更新快取。
-const VERSION = 'tcalm-v5';
+const VERSION = 'tcalm-v6';
 const PRECACHE = [
   './',
   './index.html',
@@ -24,6 +24,8 @@ const PRECACHE = [
   './js/mode.js',
   './js/hell.js',
   './js/hell-data.js',
+  './js/salary.js',
+  './js/salary-ui.js',
   './seed/salary-table.json',
   './assets/audio/manifest.json',
   './seed/quotes-original.csv',
