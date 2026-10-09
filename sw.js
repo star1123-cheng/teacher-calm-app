@@ -1,6 +1,6 @@
 // Service worker：快取所有靜態檔，斷網可完整使用。
 // 修改任何檔案後請把 VERSION 加 1，讓使用者裝置更新快取。
-const VERSION = 'tcalm-v1';
+const VERSION = 'tcalm-v3';
 const PRECACHE = [
   './',
   './index.html',
@@ -13,13 +13,20 @@ const PRECACHE = [
   './js/backup.js',
   './js/settings.js',
   './js/ui.js',
+  './js/dates.js',
+  './js/countdown.js',
+  './js/rotation.js',
+  './js/quote.js',
+  './js/notes.js',
+  './seed/quotes-original.csv',
+  './seed/quotes-template.csv',
   './assets/icons/icon-180.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(PRECACHE.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -37,7 +44,8 @@ self.addEventListener('fetch', (e) => {
   e.respondWith((async () => {
     const cache = await caches.open(VERSION);
     const cached = await cache.match(req, { ignoreSearch: true });
-    const network = fetch(req).then((res) => {
+    // 略過瀏覽器 HTTP 快取，確保背景更新拿到最新檔案
+    const network = fetch(req.mode === 'navigate' ? req.url : req, { cache: 'no-cache' }).then((res) => {
       if (res.ok && res.status === 200) cache.put(req, res.clone());
       return res;
     }).catch(() => null);
