@@ -19,7 +19,7 @@
   --bg-hell: url(../assets/img/hell-bg-mobile.webp);
   --c-ink: #202c46; --c-ink-soft: #4a5672; --c-card: rgba(255, 255, 255, .66); --c-line: transparent;
   --c-track: rgba(32, 44, 70, .14); --c-fill: #4f6596; --c-btn: rgba(255, 255, 255, .5);
-  --c-sheet: #f6f8fc; --c-scrim: rgba(0, 0, 0, .4); --c-toast: rgba(32, 44, 70, .88); --c-toast-ink: #f4f6fb;
+  --c-sheet: #f6f8fc; --c-scrim: rgba(0, 0, 0, .3); --c-toast: rgba(32, 44, 70, .88); --c-toast-ink: #f4f6fb;
   --c-error: #b3261e; --c-field: rgba(255, 255, 255, .8);
 }
 @media (min-width: 769px) {
@@ -164,7 +164,8 @@ button.tile { aspect-ratio: var(--tile-ar); display: flex; flex-direction: colum
   transition: transform .35s var(--ease), opacity .35s var(--ease);
 }
 .sheet.is-open { opacity: 1; transform: none; transition-duration: .5s; }
-.sheet::backdrop { background: var(--c-scrim); opacity: 0; transition: opacity .35s var(--ease); }
+/* 彈窗開啟時背景模糊，關閉時隨淡出恢復 */
+.sheet::backdrop { background: var(--c-scrim); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transition: opacity .35s var(--ease); }
 .sheet.is-open::backdrop { opacity: 1; transition-duration: .5s; }
 .sheet.wide { --sheet-w: 400px; }
 @media (min-width: 769px) { .sheet.wide { --sheet-w: 520px; } }

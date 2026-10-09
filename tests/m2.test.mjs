@@ -84,3 +84,13 @@ test('工作紀要：排序、篩選、文字格式、空白不可新增', () =>
   assert.ok(validateNote({ date: '2026-10-09', tag: '教學', text: '   ' }));
   assert.equal(validateNote({ date: '2026-10-09', tag: '教學', text: 'ok' }), null);
 });
+
+test('工作紀要分類：預設教學、行政，可自訂（最多 10 字）', async () => {
+  const { TAGS, allTags, cleanTag, validateNote } = await import('../js/notes.js');
+  assert.deepEqual(TAGS, ['教學', '行政']);
+  assert.deepEqual(allTags([{ tag: '社團' }, { tag: '教學' }, { tag: ' 社團 ' }]), ['教學', '行政', '社團']);
+  assert.equal(cleanTag(' [研習]\n'), '研習');
+  assert.equal(validateNote({ date: '2026-10-09', tag: '社團', text: 'ok' }), null);
+  assert.ok(validateNote({ date: '2026-10-09', tag: '  ', text: 'ok' }));
+  assert.ok(validateNote({ date: '2026-10-09', tag: '一二三四五六七八九十一', text: 'ok' }));
+});

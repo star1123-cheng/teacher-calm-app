@@ -6,7 +6,6 @@ export const APP_ID = 'teacher-calm-app';
 export const SCHEMA_VERSION = 1;
 export const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
-const NOTE_TAGS = ['教學', '行政', '網管'];
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const isStr = (v) => typeof v === 'string';
 const isDate = (v) => isStr(v) && /^\d{4}-\d{2}-\d{2}$/.test(v);
@@ -35,7 +34,7 @@ const validators = {
   [KEYS.soupState]: (v) => (checkRotation(v) ? null : '毒雞湯輪替狀態格式錯誤'),
   [KEYS.notes]: (v) => {
     if (!Array.isArray(v)) return '工作紀要不是陣列';
-    const bad = v.findIndex((x) => !isObj(x) || !isStr(x.id) || !isDate(x.date) || !NOTE_TAGS.includes(x.tag) || !isStr(x.text) || !x.text || typeof x.done !== 'boolean');
+    const bad = v.findIndex((x) => !isObj(x) || !isStr(x.id) || !isDate(x.date) || !isStr(x.tag) || !x.tag.trim() || x.tag.length > 10 || !isStr(x.text) || !x.text || typeof x.done !== 'boolean');
     return bad >= 0 ? `工作紀要第 ${bad + 1} 筆欄位錯誤` : null;
   },
   [KEYS.hell]: validateHell,
