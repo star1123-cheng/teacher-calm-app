@@ -4,7 +4,7 @@
 export const TIMER_OPTIONS = [0, 15, 30, 60];
 export const FADE_SECONDS = 3;
 export const MAX_MIX = 2;
-const SAFE_FILE = /^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,80}\.mp3$/;
+export const SAFE_FILE = /^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,80}\.mp3$/;
 
 // 把尾端 fade 個取樣交叉淡入到開頭，回傳長度少 fade 的陣列；循環播放時頭尾連續、不爆音
 export function crossfadeLoop(data, fade) {

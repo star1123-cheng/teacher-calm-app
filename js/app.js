@@ -8,6 +8,7 @@ import { initCountdown } from './countdown.js';
 import { initQuote } from './quote.js';
 import { initNotes } from './notes.js';
 import { initAudio } from './audio-ui.js';
+import { initBgm } from './bgm.js';
 import { initHell, buildHellForm } from './hell.js';
 import { getHell } from './hell-data.js';
 
@@ -34,6 +35,7 @@ initCountdown();
 initQuote();
 initNotes();
 initAudio();
+initBgm();
 initHell();
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {

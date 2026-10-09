@@ -87,7 +87,7 @@ export function defaultSettings(today = new Date()) {
   return {
     version: 1,
     countdown: { start: toISODate(today), end: `${y}-12-31` },
-    audio: { mixEnabled: false, volume: 0.5, lastTrack: null },
+    audio: { mixEnabled: false, volume: 0.5, lastTrack: null, bgmEnabled: true },
   };
 }
 

@@ -72,6 +72,8 @@ export function initAudio(root = document.getElementById('audio')) {
     document.getElementById('noise-dot').classList.toggle('on', names.length > 0);
     const left = Math.max(0, Math.ceil((engine.timerEnd - Date.now()) / 60000));
     status.textContent = on && engine.timerEnd ? `約 ${left} 分鐘後淡出關閉` : '';
+    // 通知背景音樂：白噪音播放中就暫停
+    document.dispatchEvent(new CustomEvent('tcalm:noise'));
   }
   engine.onChange = render;
   setInterval(() => { if (engine.timerEnd) render(); }, 15000);

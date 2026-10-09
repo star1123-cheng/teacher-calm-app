@@ -24,3 +24,8 @@ tests/tmp/
 
 # Claude Code 本機設定
 .claude/
+
+# 不再使用的音訊素材（留在本機，不進 Git）
+assets/audio/bgm_*.mp3
+assets/audio/sources.csv
+assets/audio/*.mid

@@ -1,3 +1,12 @@
 {
-  "tracks": []
+  "tracks": [
+    { "name": "海浪", "file": "noise_01_ocean_waves.mp3" },
+    { "name": "營火", "file": "noise_02_campfire.mp3" },
+    { "name": "森林雨聲", "file": "noise_03_rain.mp3" },
+    { "name": "高山柔風", "file": "noise_04_wind.mp3" }
+  ],
+  "bgm": [
+    "ai_similar_01_cafe_bossa.mp3",
+    "ai_similar_02_forest_fantasy.mp3"
+  ]
 }
