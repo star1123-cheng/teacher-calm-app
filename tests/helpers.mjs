@@ -30,13 +30,15 @@ export function installMockAudio() {
     constructor() { this.state = 'running'; this.currentTime = 0; this.sampleRate = 8000; this.destination = new Node(); }
     resume() { this.state = 'running'; return Promise.resolve(); }
     createGain() { const n = new Node(); n.gain = param(); return n; }
-    createBuffer(ch, len, rate) { return { length: len, sampleRate: rate, copyToChannel() {} }; }
-    decodeAudioData() { return Promise.resolve({ length: 8000, sampleRate: 8000, numberOfChannels: 1, getChannelData: () => new Float32Array(8000) }); }
-    createBufferSource() { const n = new Node(); n.started = false; n.stopped = false; n.start = () => { n.started = true; }; n.stop = () => { n.stopped = true; }; return n; }
+    createMediaElementSource() { return new Node(); }
   }
   globalThis.AudioContext = Ctx;
-  // 假的 fetch：任何音檔都回傳一段空資料
-  globalThis.fetch = async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(8) });
+  // 假的 <audio>：記錄 play() 被呼叫幾次
+  globalThis.Audio = class {
+    constructor() { this.paused = true; this.playCalls = 0; this.currentTime = 0; this.src = ''; }
+    play() { this.playCalls++; this.paused = false; return Promise.resolve(); }
+    pause() { this.paused = true; }
+  };
 }
 
 // 測試用的音檔清單（不需要真的 mp3）

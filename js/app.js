@@ -8,7 +8,8 @@ import { initCountdown } from './countdown.js';
 import { initQuote } from './quote.js';
 import { initNotes } from './notes.js';
 import { initAudio } from './audio-ui.js';
-import { initBgm } from './bgm.js';
+import { initBgm, sanitizeBgm } from './bgm.js';
+import { sanitizeManifest, warmAudioCache } from './audio.js';
 import { initSplash } from './splash.js';
 import { initHell, buildHellForm } from './hell.js';
 import { getHell } from './hell-data.js';
@@ -35,10 +36,14 @@ initSettings({ onImported: () => setTimeout(() => location.reload(), 800) });
 initCountdown();
 initQuote();
 initNotes();
-// 順序：先下載背景音樂（開場動畫期間），好了再下載白噪音
+// 背景音樂在開場動畫期間先緩衝開頭；開場結束 3 秒後，再把所有音檔一首一首存進離線快取
 const bgm = initBgm();
-initAudio({ preloadAfter: bgm.ready });
+initAudio();
 initSplash(bgm.ready);
+document.addEventListener('tcalm:splash-done', () => setTimeout(async () => {
+  const json = await fetch('assets/audio/manifest.json').then((r) => r.json()).catch(() => null);
+  warmAudioCache([...sanitizeBgm(json), ...sanitizeManifest(json).map((t) => t.file)]);
+}, 3000), { once: true });
 initHell();
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {

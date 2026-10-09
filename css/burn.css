@@ -1,0 +1,9 @@
+/* 地獄轉場「燒幕」：行書字型只擷取用到的字（Yuji Syuku，SIL OFL 授權，見 assets/fonts/OFL-YujiSyuku.txt） */
+@font-face {
+  font-family: "TcalmBrush";
+  src: url(../assets/fonts/brush-subset.woff2) format("woff2");
+  font-display: block;
+}
+.burn { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 900; touch-action: none; cursor: pointer; }
+/* 布幕蓋住畫面時直接換面，不播翻面動畫 */
+.mode-instant .flip-inner { transition: none !important; }

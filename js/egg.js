@@ -1,7 +1,7 @@
-// 彩蛋計數：第一下起算 3 秒內點滿 5 下才觸發；超過 3 秒就從這一下重新計算
-export const TAPS = 5;
-export const WINDOW_MS = 3000;
-export const HINT_FROM = 3;
+// 彩蛋計數：第一下起算 5 秒內點滿 3 下才觸發；超過 5 秒就從這一下重新計算
+export const TAPS = 3;
+export const WINDOW_MS = 5000;
+export const HINT_FROM = 2;
 
 export function createTapCounter({ taps = TAPS, windowMs = WINDOW_MS, hintFrom = HINT_FROM } = {}) {
   let first = 0;

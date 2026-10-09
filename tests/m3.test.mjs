@@ -6,21 +6,21 @@ installMockStorage();
 installMockAudio();
 const { createTapCounter } = await import('../js/egg.js');
 const { retireCountdown, validateHell, exampleHell } = await import('../js/hell-data.js');
-const { crossfadeLoop, sanitizeManifest, AudioEngine, FADE_SECONDS } = await import('../js/audio.js');
+const { sanitizeManifest, AudioEngine, FADE_SECONDS } = await import('../js/audio.js');
 
-test('彩蛋：3 秒內 5 下必定切換，第 4 秒才點第 5 下不切換', () => {
+test('彩蛋：5 秒內 3 下必定切換，第 6 秒才點第 3 下不切換', () => {
   const c = createTapCounter();
-  const r = [0, 500, 1000, 1500, 2000].map((t) => c.tap(t));
-  assert.deepEqual(r.map((x) => x.hint), [false, false, true, true, false]);
-  assert.equal(r[4].triggered, true);
+  const r = [0, 800, 1600].map((t) => c.tap(t));
+  assert.deepEqual(r.map((x) => x.hint), [false, true, false]);
+  assert.equal(r[2].triggered, true);
   const c2 = createTapCounter();
-  const r2 = [0, 700, 1400, 2100, 3500].map((t) => c2.tap(t));
-  assert.equal(r2[4].triggered, false);
-  assert.equal(r2[4].count, 1, '超過 3 秒後重新計數');
-  assert.equal(r2[4].hint, false);
-  // 剛好 3 秒內（含 3000ms）仍算
+  const r2 = [0, 2000, 5500].map((t) => c2.tap(t));
+  assert.equal(r2[2].triggered, false);
+  assert.equal(r2[2].count, 1, '超過 5 秒後重新計數');
+  assert.equal(r2[2].hint, false);
+  // 剛好 5 秒內（含 5000ms）仍算
   const c3 = createTapCounter();
-  assert.equal([0, 1000, 2000, 2500, 3000].map((t) => c3.tap(t)).at(-1).triggered, true);
+  assert.equal([0, 4000, 5000].map((t) => c3.tap(t)).at(-1).triggered, true);
 });
 
 test('退休倒數：剩餘天數、年月、已退休不為負', () => {
@@ -39,12 +39,19 @@ test('地獄設定：範例值合法、錯誤值擋下', () => {
   assert.ok(validateHell({ ...ex, edu: 'x' }));
 });
 
-test('音檔接縫：交叉淡入後循環頭尾相接沒有跳點', () => {
-  // 0 到 109 的斜坡訊號，頭尾差很大；淡入 10 個取樣後，最後一點接回第一點應連續
-  const data = Float32Array.from({ length: 110 }, (_, i) => i);
-  const out = crossfadeLoop(data, 10);
-  assert.equal(out.length, 100);
-  assert.ok(Math.abs(out[0] - (out[99] + 1)) < 1e-6, `接縫 ${out[99]} → ${out[0]}`);
+test('串流播放：點擊當下同步送出播放指令，停止時暫停', () => {
+  const e = new AudioEngine();
+  const p = e.play(TEST_TRACKS[0]);
+  const { audio } = e.channels.get('file:rain.mp3');
+  assert.equal(audio.playCalls, 1, '還沒 await 就已經呼叫 play()');
+  assert.equal(audio.loop, true);
+  assert.equal(audio.src, 'assets/audio/rain.mp3');
+  e.stop('file:rain.mp3');
+  assert.equal(audio.paused, true);
+  // 同一首再播，重複使用同一個播放器（Web Audio 只能接一次）
+  e.play(TEST_TRACKS[0]);
+  assert.equal(e.channels.get('file:rain.mp3').audio, audio);
+  return p;
 });
 
 test('音檔清單：過濾不安全的檔名，缺清單時只有合成', () => {

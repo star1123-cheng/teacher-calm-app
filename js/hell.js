@@ -1,10 +1,11 @@
 // 地獄模式：彩蛋進入、首次設定表單、退休倒數、薪水與毒雞湯
 import { loadSalaryTable, getHell, saveHell, exampleHell, validateHell, retireCountdown, EDU_KEYS, MAX_ALLOWANCE } from './hell-data.js';
-import { createTapCounter } from './egg.js';
+import { createTapCounter, TAPS } from './egg.js';
 import { switchMode, isBusy } from './mode.js';
 import { openSheet, closeSheet, onSheetOpen, onSheetClose } from './sheet.js';
 import { todayISO } from './dates.js';
-import { el, toast } from './ui.js';
+import { el, toast, prefersReducedMotion } from './ui.js';
+import { playBurn } from './burn.js';
 import { initSalary } from './salary-ui.js';
 import { initSoup } from './soup.js';
 
@@ -130,28 +131,44 @@ export function initHell() {
 
   tired.addEventListener('click', () => switchMode('calm', () => happy.focus()));
 
-  // 【我很快樂】：3 秒內連點 5 次翻到地獄模式；第 3 次起微提示
+  // 【我很快樂】：5 秒內連點 3 次翻到地獄模式；第 2 次起微提示
   const counter = createTapCounter();
   let hintTimer;
+  let burning = false;
+
+  // 進入地獄模式：播燒幕轉場，布幕蓋住時在底下換面並準備好資料；減少動態時直接切換
+  async function enterHell() {
+    const h = getHell();
+    const done = () => { if (!getHell()) openSheet('setup'); else tired.focus(); };
+    if (prefersReducedMotion()) {
+      switchMode('hell', async () => { if (h) await render(h); done(); });
+      return;
+    }
+    burning = true;
+    try {
+      await playBurn({ onCovered: () => { switchMode('hell', null, { instant: true }); if (h) render(h); } });
+    } finally {
+      burning = false;
+    }
+    if (document.documentElement.dataset.mode !== 'hell') switchMode('hell', null, { instant: true });
+    done();
+  }
+
   happy.addEventListener('click', () => {
-    if (isBusy()) return;
+    if (isBusy() || burning) return;
     const r = counter.tap();
     happy.classList.remove('hint', 'hint-strong');
     if (r.hint) {
       void happy.offsetWidth; // 重新觸發抖動動畫
-      happy.classList.add(r.count >= 4 ? 'hint-strong' : 'hint');
+      happy.classList.add(r.count >= TAPS - 1 ? 'hint-strong' : 'hint');
       clearTimeout(hintTimer);
       hintTimer = setTimeout(() => happy.classList.remove('hint', 'hint-strong'), 3000);
     }
     if (r.triggered) {
-      switchMode('hell', async () => {
-        const h = getHell();
-        if (!h) openSheet('setup');
-        else { await render(h); tired.focus(); }
-      });
+      enterHell();
       return;
     }
-    toast(HAPPY_TOASTS[r.count] || `再點 ${5 - r.count} 下⋯`, 1600);
+    toast(HAPPY_TOASTS[r.count] || `再點 ${TAPS - r.count} 下⋯`, 1600);
   });
   happy.addEventListener('animationend', () => happy.classList.remove('hint', 'hint-strong'));
 

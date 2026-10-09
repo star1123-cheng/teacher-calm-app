@@ -7,7 +7,8 @@ export const FLIP_MS = 800;
 let busy = false;
 export const isBusy = () => busy;
 
-export function switchMode(mode, afterSwitch) {
+// instant：不播翻面動畫直接換面（燒幕轉場時布幕已經蓋住畫面）
+export function switchMode(mode, afterSwitch, { instant = false } = {}) {
   const root = document.documentElement;
   if (busy || root.dataset.mode === mode) return;
   closeSheet();
@@ -19,7 +20,12 @@ export function switchMode(mode, afterSwitch) {
   calm.inert = toHell; calm.setAttribute('aria-hidden', String(toHell));
   hell.inert = !toHell; hell.setAttribute('aria-hidden', String(!toHell));
   applyTheme();
-  if (prefersReducedMotion()) { afterSwitch?.(); return; }
+  if (instant) {
+    root.classList.add('mode-instant');
+    void root.offsetWidth; // 先讓瀏覽器套用新畫面，再把翻面動畫恢復
+    requestAnimationFrame(() => root.classList.remove('mode-instant'));
+  }
+  if (instant || prefersReducedMotion()) { afterSwitch?.(); return; }
   busy = true;
   setTimeout(() => { busy = false; afterSwitch?.(); }, FLIP_MS);
 }
