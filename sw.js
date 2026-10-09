@@ -1,13 +1,14 @@
 // Service worker：快取所有靜態檔，斷網可完整使用。
 // 修改任何檔案後請把 VERSION 加 1，讓使用者裝置更新快取。
-const VERSION = 'tcalm-v7';
+const VERSION = 'tcalm-v9';
 const PRECACHE = [
   './',
   './index.html',
   './manifest.json',
   './css/base.css',
   './js/app.js',
-  './js/router.js',
+  './js/sheet.js',
+  './js/theme.js',
   './js/storage.js',
   './js/csv.js',
   './js/backup.js',
@@ -35,6 +36,12 @@ const PRECACHE = [
   './assets/icons/icon-180.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
+  './assets/img/calm-bg-mobile-day.webp',
+  './assets/img/calm-bg-mobile-night.webp',
+  './assets/img/calm-bg-desktop-day.webp',
+  './assets/img/calm-bg-desktop-night.webp',
+  './assets/img/hell-bg-mobile.webp',
+  './assets/img/hell-bg-desktop.webp',
 ];
 
 self.addEventListener('install', (e) => {

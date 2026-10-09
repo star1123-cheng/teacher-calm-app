@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant-TW">
+<html lang="zh-Hant-TW" data-theme="day" data-mode="calm">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,91 +7,206 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>教師寧靜</title>
-  <meta name="theme-color" content="#5b7a6e">
+  <meta name="theme-color" content="#e9eef6">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="教師寧靜">
   <link rel="stylesheet" href="css/base.css">
   <script type="module" src="js/app.js"></script>
 </head>
 <body>
-  <header class="app-header">
-    <h1>教師寧靜</h1>
-    <nav aria-label="主選單" id="nav">
-      <button type="button" data-view="home" aria-current="page">首頁</button>
-      <button type="button" data-view="notes">工作紀要</button>
-      <button type="button" data-view="settings">設定</button>
-    </nav>
-  </header>
+<div id="app">
+  <div class="flip">
+    <div class="flip-inner">
 
-  <main>
-    <!-- 寧靜模式首頁 -->
-    <section id="view-home" data-mode="quiet" aria-labelledby="h-home">
-      <h2 id="h-home" class="visually-hidden">寧靜模式</h2>
-      <section id="countdown" aria-labelledby="h-countdown"><h3 id="h-countdown">時光倒數</h3></section>
-      <section id="quote" aria-labelledby="h-quote"><h3 id="h-quote">一日一句</h3></section>
-      <section id="audio" aria-labelledby="h-audio"><h3 id="h-audio">白噪音</h3></section>
-      <p><button type="button" id="btn-happy" class="mode-btn">我很快樂</button></p>
-    </section>
+      <!-- 寧靜模式 -->
+      <section class="face face-calm" id="view-home" aria-label="寧靜模式">
+        <div class="bg bg-day" aria-hidden="true"></div>
+        <div class="bg bg-night" aria-hidden="true"></div>
+        <main class="layout">
+          <div class="calm-grid">
+            <section class="calm-top">
+              <div id="countdown" class="card card-countdown" role="button" tabindex="0" aria-haspopup="dialog">
+                <span class="label">時光倒數</span>
+                <span class="days-row"><span class="num num-days" id="cd-days">0</span><span class="unit" id="cd-unit">天</span></span>
+                <span class="cd-foot">
+                  <span class="bar" aria-hidden="true"><span class="bar-fill" id="cd-bar"></span></span>
+                  <span class="cd-meta"><span id="cd-end-label"></span><span id="cd-start-label"></span></span>
+                </span>
+              </div>
+              <article id="quote" class="card card-quote" role="button" tabindex="0" aria-haspopup="dialog">
+                <span class="label">一日一句</span>
+                <p class="quote-text" id="quote-text"></p>
+                <span class="quote-meta" id="quote-meta"></span>
+              </article>
+            </section>
+            <section class="tiles">
+              <button type="button" id="tile-notes" class="card tile" aria-haspopup="dialog">
+                <span class="tile-head">
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><rect x="4.5" y="3.5" width="17" height="19" rx="3"></rect><line x1="9" y1="9.5" x2="17" y2="9.5"></line><line x1="9" y1="13.5" x2="17" y2="13.5"></line><line x1="9" y1="17.5" x2="13.5" y2="17.5"></line></svg>
+                  <span class="tile-title">工作紀要</span>
+                </span>
+                <span class="tile-foot">
+                  <span class="small">今日未完成</span>
+                  <span class="days-row"><span class="num num-tile" id="notes-pending">0</span><span class="unit-sm">筆</span></span>
+                </span>
+              </button>
+              <button type="button" id="tile-noise" class="card tile" aria-haspopup="dialog">
+                <span class="tile-head">
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="11" x2="5" y2="15"></line><line x1="9.5" y1="8" x2="9.5" y2="18"></line><line x1="14" y1="5" x2="14" y2="21"></line><line x1="18.5" y1="9" x2="18.5" y2="17"></line><line x1="23" y1="11.5" x2="23" y2="14.5"></line></svg>
+                  <span class="tile-title">白噪音</span>
+                </span>
+                <span class="tile-foot">
+                  <span class="small">目前狀態</span>
+                  <span class="status-row"><span class="dot" id="noise-dot"></span><span id="noise-status">未播放</span></span>
+                </span>
+              </button>
+            </section>
+          </div>
+          <div class="bottom-row">
+            <button type="button" id="btn-happy" class="mode-btn">完成今天工作了，我好快樂</button>
+            <button type="button" id="btn-settings" class="icon-btn" aria-label="設定" aria-haspopup="dialog">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"></path></svg>
+            </button>
+          </div>
+        </main>
+      </section>
 
-    <section id="view-notes" hidden aria-labelledby="h-notes">
-      <h2 id="h-notes">工作紀要</h2>
-    </section>
+      <!-- 地獄模式 -->
+      <section class="face face-hell" id="view-hell" aria-label="地獄模式" aria-hidden="true" inert>
+        <main class="layout">
+          <div class="hell-grid">
+            <section class="hell-left">
+              <div id="hell-retire" class="card card-hell">
+                <span class="label">退休倒數 <span class="badge" id="retire-badge" hidden>範例</span></span>
+                <span class="days-row"><span class="num num-hell-xl" id="retire-days">0</span><span class="unit" id="retire-unit">天</span></span>
+                <span class="small" id="retire-ym"></span>
+              </div>
+              <div id="hell-salary" class="card card-hell" role="button" tabindex="0" aria-haspopup="dialog">
+                <span class="label"><span id="salary-label">已領累計</span> <span class="badge" id="salary-badge" hidden>範例</span></span>
+                <span class="money-row"><span class="small">NT$</span><span class="num-money" id="salary-earned">0.00</span></span>
+                <span class="salary-meta"><span id="salary-monthly"></span><span id="salary-persec"></span></span>
+                <span class="disclaimer">不含年終、考績獎金與扣款，僅供娛樂</span>
+              </div>
+            </section>
+            <div id="hell-deck" role="button" tabindex="0" aria-label="抽一張毒雞湯" aria-haspopup="dialog">
+              <div class="deck-card"><div class="deck-inner"><span class="deck-kicker">毒雞湯</span><span class="deck-title">抽一張</span></div></div>
+            </div>
+          </div>
+          <div class="bottom-row">
+            <button type="button" id="btn-tired" class="mode-btn">我真的累了</button>
+          </div>
+        </main>
+      </section>
 
-    <section id="view-settings" hidden aria-labelledby="h-settings">
-      <h2 id="h-settings">設定</h2>
+    </div>
+  </div>
+</div>
 
+<!-- 共用面板（彈窗） -->
+<dialog id="sheet" class="sheet" aria-labelledby="sheet-title">
+  <div class="sheet-body">
+    <div class="sheet-head">
+      <h2 id="sheet-title"></h2>
+      <button type="button" class="sheet-close" id="sheet-close" aria-label="關閉">×</button>
+    </div>
+
+    <div data-panel="ring" hidden>
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg width="100%" height="100%" viewBox="0 0 200 200" aria-hidden="true"><circle class="ring-track" cx="100" cy="100" r="90"></circle><circle class="ring-fill" id="ring-fill" cx="100" cy="100" r="90"></circle></svg>
+          <div class="ring-center">
+            <span class="ring-num" id="ring-num">0</span>
+            <span class="small" id="ring-sub"></span>
+          </div>
+        </div>
+        <p class="small" id="ring-meta"></p>
+        <p class="ring-done-text" id="ring-done-text" hidden>這一段路走完了，辛苦了。好好休息，再出發。</p>
+        <p class="btn-row center"><button type="button" class="btn" id="cd-renew" hidden>設定新的倒數</button><button type="button" class="btn btn-ghost" id="cd-edit">修改日期</button></p>
+      </div>
+      <form class="form" id="cd-form" hidden>
+        <p><label for="cd-start">起點日</label><input type="date" id="cd-start" required></p>
+        <p><label for="cd-end">終點日</label><input type="date" id="cd-end" required></p>
+        <p class="error" id="cd-error" role="alert"></p>
+        <p class="btn-row"><button type="submit" class="btn">儲存</button><button type="button" class="btn btn-ghost" id="cd-cancel">取消</button></p>
+      </form>
+    </div>
+
+    <div data-panel="quote" hidden>
+      <blockquote class="quote-full"><p id="quote-full-text"></p></blockquote>
+      <p class="small" id="quote-full-meta"></p>
+    </div>
+
+    <div data-panel="notes" id="view-notes" hidden></div>
+
+    <div data-panel="noise" id="audio" hidden></div>
+
+    <div data-panel="settings" id="view-settings" hidden>
       <section id="quote-import" aria-labelledby="h-quote-import">
         <h3 id="h-quote-import">一日一句句庫（作家句）</h3>
       </section>
 
       <section aria-labelledby="h-audio-note">
         <h3 id="h-audio-note">白噪音</h3>
-        <p><label><input type="checkbox" id="mix-enabled"> 開啟混音（最多同時播放 2 軌，各自調音量）</label></p>
-        <p>iPhone／iPad 螢幕鎖定或切換到其他 App 後，系統可能會暫停網頁的聲音，無法保證背景播放。</p>
-        <p>自備音檔請放在 <code>assets/audio/</code>，並登記在 <code>assets/audio/manifest.json</code>。</p>
+        <p><label class="check"><input type="checkbox" id="mix-enabled"> 開啟混音（最多同時播放 2 軌，各自調音量）</label></p>
+        <p class="small">iPhone／iPad 螢幕鎖定或切換到其他 App 後，系統可能會暫停網頁的聲音，無法保證背景播放。</p>
+        <p class="small">自備音檔請放在 <code>assets/audio/</code>，並登記在 <code>assets/audio/manifest.json</code>。</p>
       </section>
 
       <section id="hell-settings" hidden aria-labelledby="h-hell-settings">
         <h3 id="h-hell-settings">退休與薪資資料</h3>
-        <p class="muted">只存在這台裝置。</p>
+        <p class="small">只存在這台裝置。</p>
         <div id="hell-settings-form"></div>
       </section>
 
       <section aria-labelledby="h-backup">
         <h3 id="h-backup">備份</h3>
         <p class="warn">所有資料只存在這台裝置的瀏覽器裡。清除瀏覽器資料會遺失內容，請定期匯出備份。</p>
-        <p>
-          <button type="button" id="btn-export">匯出備份</button>
-          <label class="file-btn">匯入備份
+        <p class="btn-row">
+          <button type="button" class="btn" id="btn-export">匯出備份</button>
+          <label class="btn btn-ghost file-btn">匯入備份
             <input type="file" id="file-import" accept="application/json,.json">
           </label>
         </p>
-        <p id="storage-usage" class="muted"></p>
+        <p id="storage-usage" class="small"></p>
       </section>
-    </section>
+    </div>
 
-    <!-- 地獄模式（M3） -->
-    <section id="view-hell" data-mode="hell" hidden aria-labelledby="h-hell">
-      <h2 id="h-hell">地獄模式</h2>
-    </section>
-  </main>
+    <div data-panel="salary" id="salary-detail" hidden></div>
 
-  <dialog id="dlg-import" aria-labelledby="h-dlg-import">
-    <form method="dialog">
-      <h3 id="h-dlg-import">確認匯入備份</h3>
-      <p>匯入後會<strong>覆蓋</strong>這台裝置上的所有資料。</p>
-      <ul id="import-summary"></ul>
-      <p>
-        <button value="cancel">取消</button>
-        <button value="ok" id="btn-import-ok">確認覆蓋</button>
-      </p>
-    </form>
-  </dialog>
+    <div data-panel="draw" hidden>
+      <div class="draw-stage">
+        <div class="draw-card" id="draw-card">
+          <div class="draw-back"><div class="deck-inner"><span class="deck-title">抽一張</span></div></div>
+          <div class="draw-face">
+            <span class="draw-no" id="draw-no">毒雞湯</span>
+            <p class="draw-text" id="draw-text" aria-live="polite"></p>
+            <span class="draw-foot">僅供娛樂</span>
+          </div>
+        </div>
+      </div>
+      <p class="btn-row center"><button type="button" class="btn btn-fill" id="draw-again">再抽一張</button><button type="button" class="btn btn-ghost" id="draw-close">關閉</button></p>
+    </div>
 
-  <div id="transition" hidden aria-hidden="true"></div>
-  <div id="toast" role="status" aria-live="polite"></div>
+    <div data-panel="setup" id="hell-setup" hidden></div>
+  </div>
+</dialog>
+
+<dialog id="dlg-import" class="sheet is-open" aria-labelledby="h-dlg-import">
+  <form method="dialog" class="sheet-body">
+    <h2 id="h-dlg-import">確認匯入備份</h2>
+    <p>匯入後會<strong>覆蓋</strong>這台裝置上的所有資料。</p>
+    <ul id="import-summary"></ul>
+    <p class="btn-row">
+      <button value="cancel" class="btn btn-ghost">取消</button>
+      <button value="ok" id="btn-import-ok" class="btn">確認覆蓋</button>
+    </p>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite" popover="manual"></div>
 </body>
 </html>

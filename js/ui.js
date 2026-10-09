@@ -19,8 +19,14 @@ export function toast(msg, ms = 4000) {
   const t = document.getElementById('toast');
   if (!t) return;
   t.textContent = msg;
+  // 用 popover 放到最上層，彈窗開著時也看得到
+  try { if (t.matches(':popover-open')) t.hidePopover(); t.showPopover(); } catch { /* 舊瀏覽器不支援 popover */ }
+  t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.textContent = ''; }, ms);
+  toastTimer = setTimeout(() => {
+    t.classList.remove('show');
+    toastTimer = setTimeout(() => { try { t.hidePopover(); } catch { /* 忽略 */ } }, 300);
+  }, ms);
 }
 
 export function download(filename, text, type = 'application/json') {

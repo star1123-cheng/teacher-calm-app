@@ -1,28 +1,25 @@
-// 寧靜／地獄模式切換（不保存模式，重新整理一律回寧靜模式）
-import { showView } from './router.js';
+// 寧靜／地獄模式整頁翻面（不保存模式，重新整理一律回寧靜模式）
 import { prefersReducedMotion } from './ui.js';
+import { applyTheme } from './theme.js';
+import { closeSheet } from './sheet.js';
 
-export const TRANSITION_MS = 1000;
+export const FLIP_MS = 800;
 let busy = false;
+export const isBusy = () => busy;
 
 export function switchMode(mode, afterSwitch) {
-  if (busy) return;
-  const apply = () => {
-    document.body.classList.toggle('mode-hell', mode === 'hell');
-    showView(mode === 'hell' ? 'hell' : 'home');
-    afterSwitch?.();
-  };
-  if (prefersReducedMotion()) { apply(); return; }
-  // 約 1 秒轉場：前半段畫面變暗變紅，切換後再淡出
+  const root = document.documentElement;
+  if (busy || root.dataset.mode === mode) return;
+  closeSheet();
+  const calm = document.getElementById('view-home');
+  const hell = document.getElementById('view-hell');
+  const toHell = mode === 'hell';
+  root.dataset.mode = mode;
+  // 看不到的那一面設為 inert，避免鍵盤焦點與讀屏誤入
+  calm.inert = toHell; calm.setAttribute('aria-hidden', String(toHell));
+  hell.inert = !toHell; hell.setAttribute('aria-hidden', String(!toHell));
+  applyTheme();
+  if (prefersReducedMotion()) { afterSwitch?.(); return; }
   busy = true;
-  const overlay = document.getElementById('transition');
-  overlay.className = mode === 'hell' ? 'to-hell' : 'to-quiet';
-  overlay.hidden = false;
-  void overlay.offsetWidth; // 先讓瀏覽器套用初始透明度，淡入動畫才會出現
-  overlay.classList.add('on');
-  setTimeout(() => {
-    apply();
-    overlay.classList.remove('on');
-    setTimeout(() => { overlay.hidden = true; busy = false; }, TRANSITION_MS / 2);
-  }, TRANSITION_MS / 2);
+  setTimeout(() => { busy = false; afterSwitch?.(); }, FLIP_MS);
 }

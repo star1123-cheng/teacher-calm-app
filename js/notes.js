@@ -2,6 +2,7 @@
 import { KEYS, load, save, uid } from './storage.js';
 import { todayISO, isISODate } from './dates.js';
 import { el, toast } from './ui.js';
+import { openSheet, onSheetOpen } from './sheet.js';
 
 export const TAGS = ['教學', '行政', '網管'];
 export const MAX_TEXT = 1000;
@@ -43,37 +44,41 @@ async function copyText(text) {
   }
 }
 
+// 首頁卡片：今日（日期為今天）未完成的筆數
+export function pendingToday(notes, today) {
+  return notes.filter((n) => n.date === today && !n.done).length;
+}
+
 export function initNotes(root = document.getElementById('view-notes')) {
   let editingId = null;
   const dateIn = el('input', { type: 'date', id: 'note-date', required: true });
   const tagIn = el('select', { id: 'note-tag' }, TAGS.map((t) => el('option', { value: t, text: t })));
   const textIn = el('textarea', { id: 'note-text', rows: 3, maxlength: String(MAX_TEXT), required: true });
-  const submit = el('button', { type: 'submit', text: '新增', disabled: true });
-  const cancel = el('button', { type: 'button', text: '取消編輯', hidden: true });
+  const submit = el('button', { type: 'submit', class: 'btn', text: '新增', disabled: true });
+  const cancel = el('button', { type: 'button', class: 'btn btn-ghost', text: '取消編輯', hidden: true });
   const err = el('p', { class: 'error', role: 'alert' });
+  const field = (label, input, full) => el('p', { class: full ? 'field field-full' : 'field' }, el('label', { for: input.id, text: label }), input);
   const form = el('form', { class: 'note-form' },
-    el('label', { for: 'note-date', text: '日期' }), dateIn,
-    el('label', { for: 'note-tag', text: '分類' }), tagIn,
-    el('label', { for: 'note-text', text: '內容' }), textIn,
-    el('p', {}, submit, cancel), err,
+    field('日期', dateIn), field('分類', tagIn), field('內容', textIn, true),
+    el('p', { class: 'btn-row' }, submit, cancel), err,
   );
 
   const fTag = el('select', { id: 'filter-tag' }, el('option', { value: 'all', text: '全部分類' }), TAGS.map((t) => el('option', { value: t, text: t })));
   const fStatus = el('select', { id: 'filter-status' },
     el('option', { value: 'all', text: '全部狀態' }), el('option', { value: 'todo', text: '未完成' }), el('option', { value: 'done', text: '已完成' }));
-  const copyBtn = el('button', { type: 'button', text: '複製成文字' });
+  const copyBtn = el('button', { type: 'button', class: 'btn btn-ghost', text: '複製成文字' });
   const list = el('ul', { class: 'note-list' });
-  const empty = el('p', { class: 'muted' });
+  const empty = el('p', { class: 'small' });
 
   root.append(form,
     el('div', { class: 'note-filters' },
-      el('label', { for: 'filter-tag', text: '篩選分類' }), fTag,
-      el('label', { for: 'filter-status', text: '篩選狀態' }), fStatus, copyBtn),
+      field('篩選分類', fTag), field('篩選狀態', fStatus), el('p', { class: 'field' }, copyBtn)),
     empty, list);
 
   const getAll = () => load(KEYS.notes, []);
   const currentFilter = () => ({ tag: fTag.value, status: fStatus.value });
   const visible = () => sortNotes(filterNotes(getAll(), currentFilter()));
+  const tileCount = document.getElementById('notes-pending');
 
   function resetForm() {
     editingId = null;
@@ -87,6 +92,7 @@ export function initNotes(root = document.getElementById('view-notes')) {
   }
 
   function render() {
+    if (tileCount) tileCount.textContent = String(pendingToday(getAll(), todayISO()));
     const items = visible();
     empty.textContent = items.length ? '' : '沒有符合的紀要。';
     list.replaceChildren(...items.map((n) => {
@@ -94,11 +100,12 @@ export function initNotes(root = document.getElementById('view-notes')) {
       cb.addEventListener('change', () => update(n.id, { done: cb.checked }));
       return el('li', { class: n.done ? 'done' : null },
         cb,
-        el('span', { class: 'note-date', text: n.date }), ' ',
-        el('span', { class: 'note-tag', text: `[${n.tag}]` }), ' ',
-        el('span', { class: 'note-text', text: n.text }), ' ',
-        el('button', { type: 'button', text: '編輯', onclick: () => startEdit(n) }),
-        el('button', { type: 'button', text: '刪除', onclick: () => remove(n) }),
+        el('span', { class: 'note-main' },
+          el('span', { class: 'note-sub', text: `${n.date}　[${n.tag}]` }),
+          el('span', { class: 'note-text', text: n.text })),
+        el('span', { class: 'note-actions' },
+          el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: '編輯', onclick: () => startEdit(n) }),
+          el('button', { type: 'button', class: 'btn btn-ghost btn-sm', text: '刪除', onclick: () => remove(n) })),
       );
     }));
   }
@@ -109,7 +116,8 @@ export function initNotes(root = document.getElementById('view-notes')) {
   }
 
   function remove(n) {
-    if (!confirm(`確定刪除這筆紀要？\n${n.date} [${n.tag}] ${n.text.slice(0, 40)}`)) return;
+    if (!confirm(`確定刪除這筆紀要？
+${n.date} [${n.tag}] ${n.text.slice(0, 40)}`)) return;
     if (save(KEYS.notes, getAll().filter((x) => x.id !== n.id))) {
       if (editingId === n.id) resetForm();
       render();
@@ -148,6 +156,9 @@ export function initNotes(root = document.getElementById('view-notes')) {
     toast((await copyText(notesToText(items))) ? `已複製 ${items.length} 筆紀要。` : '複製失敗，請手動選取。');
   });
 
+  document.getElementById('tile-notes').addEventListener('click', () => openSheet('notes'));
+  onSheetOpen('notes', () => { if (!editingId) dateIn.value = todayISO(); render(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
   resetForm();
   render();
 }

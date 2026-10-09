@@ -4,6 +4,7 @@ import { parseCSV } from './csv.js';
 import { pickToday } from './rotation.js';
 import { todayISO } from './dates.js';
 import { el, toast } from './ui.js';
+import { openSheet, clickable } from './sheet.js';
 
 export const ORIGINAL = '原創';
 const LIMITS = { text: 500, author: 100, book: 200, page: 20 };
@@ -65,18 +66,24 @@ export async function loadOriginals() {
   return originalsCache;
 }
 
-export function renderQuoteCard(box, q) {
-  if (!q) { box.replaceChildren(el('p', { class: 'muted', text: '句庫是空的。' })); return; }
-  const meta = [q.author, q.book ? `《${q.book}》` : null, q.page ? `第 ${q.page} 頁` : null].filter(Boolean).join('　');
-  box.replaceChildren(
-    el('blockquote', {}, el('p', { class: 'q-text', text: q.text })),
-    el('p', { class: 'q-meta', text: `—— ${meta}` }),
-  );
+// 作者、書名（有才顯示）、頁碼（有才顯示）
+export function quoteMeta(q) {
+  return [q.author, q.book ? `《${q.book}》` : null, q.page ? `第 ${q.page} 頁` : null].filter(Boolean).join('　');
+}
+
+function renderQuoteCard(q) {
+  const $ = (id) => document.getElementById(id);
+  const text = q ? q.text : '句庫是空的。';
+  const meta = q ? `— ${quoteMeta(q)}` : '';
+  $('quote-text').textContent = text;
+  $('quote-meta').textContent = meta;
+  $('quote-full-text').textContent = text;
+  $('quote-full-meta').textContent = meta;
 }
 
 export async function initQuote(root = document.getElementById('quote')) {
-  const box = el('div', { 'aria-live': 'polite' });
-  root.append(box);
+  // 卡片最多顯示 3 行，點開可看全文
+  clickable(root, () => openSheet('quote'));
 
   async function render() {
     const user = load(KEYS.quotes, []);
@@ -86,7 +93,7 @@ export async function initQuote(root = document.getElementById('quote')) {
     const state = pickToday(prev, groups, todayISO());
     if (state !== prev) save(KEYS.quoteState, state);
     const byId = new Map([...user, ...originals].map((q) => [q.id, q]));
-    renderQuoteCard(box, state.today && byId.get(state.today.id));
+    renderQuoteCard(state.today && byId.get(state.today.id));
   }
 
   document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
@@ -98,14 +105,14 @@ export async function initQuote(root = document.getElementById('quote')) {
 function initQuoteImport(onChange) {
   const sec = document.getElementById('quote-import');
   if (!sec) return;
-  const count = el('p');
+  const count = el('p', { class: 'small' });
   const input = el('input', { type: 'file', accept: '.csv,text/csv' });
   const preview = el('div', { 'aria-live': 'polite' });
   sec.append(
-    el('p', { text: '欄位：句子,作者,書名,頁碼（UTF-8）。書名與頁碼可空白；句中有逗號、換行時整格用雙引號包住。' }),
+    el('p', { class: 'small', text: '欄位：句子,作者,書名,頁碼（UTF-8）。書名與頁碼可空白；句中有逗號、換行時整格用雙引號包住。' }),
     el('p', {}, el('a', { href: 'seed/quotes-template.csv', download: 'quotes-template.csv', text: '下載 CSV 範本' })),
     count,
-    el('label', { class: 'file-btn' }, '選擇 CSV 檔', input),
+    el('p', {}, el('label', { class: 'btn btn-ghost file-btn' }, '選擇 CSV 檔', input)),
     preview,
   );
   const refreshCount = () => { count.textContent = `目前已匯入 ${load(KEYS.quotes, []).length} 句。`; };
@@ -125,10 +132,10 @@ function initQuoteImport(onChange) {
       parts.push(el('p', { text: '前 3 筆預覽：' }), el('ol', {}, r.items.slice(0, 3).map((q) => el('li', { text: `${q.text}（${[q.author, q.book, q.page].filter(Boolean).join('，')}）` }))));
     }
     if (r.errors.length) parts.push(el('ul', { class: 'error' }, r.errors.slice(0, 20).map((e) => el('li', { text: e.message }))));
-    const actions = el('p');
+    const actions = el('p', { class: 'btn-row' });
     if (r.items.length) {
       actions.append(
-        el('button', { type: 'button', text: `確認匯入 ${r.items.length} 筆`, onclick: () => {
+        el('button', { type: 'button', class: 'btn', text: `確認匯入 ${r.items.length} 筆`, onclick: () => {
           if (save(KEYS.quotes, [...existing, ...r.items])) {
             toast(`已匯入 ${r.items.length} 句。`);
             preview.replaceChildren();
@@ -138,7 +145,7 @@ function initQuoteImport(onChange) {
         } }),
       );
     }
-    actions.append(el('button', { type: 'button', text: '取消', onclick: () => preview.replaceChildren() }));
+    actions.append(el('button', { type: 'button', class: 'btn btn-ghost', text: '取消', onclick: () => preview.replaceChildren() }));
     preview.replaceChildren(...parts, actions);
   });
 }

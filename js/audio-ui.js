@@ -2,6 +2,7 @@
 import { AudioEngine, SYNTH_TRACKS, TIMER_OPTIONS, MAX_MIX, loadFileTracks } from './audio.js';
 import { getSettings, saveSettings } from './storage.js';
 import { el, toast } from './ui.js';
+import { openSheet } from './sheet.js';
 
 export const engine = new AudioEngine();
 
@@ -20,22 +21,22 @@ export function initAudio(root = document.getElementById('audio')) {
 
   // 單軌控制
   const trackSel = el('select', { id: 'audio-track' });
-  const playBtn = el('button', { type: 'button', text: '播放', 'aria-pressed': 'false' });
-  const single = el('p', {}, el('label', { for: 'audio-track', text: '音源' }), ' ', trackSel, ' ', playBtn);
+  const playBtn = el('button', { type: 'button', class: 'btn btn-fill', text: '播放', 'aria-pressed': 'false' });
+  const single = el('div', {}, el('p', { class: 'field' }, el('label', { for: 'audio-track', text: '音源' }), trackSel), el('p', { class: 'btn-row center' }, playBtn));
   // 混音控制
   const mixer = el('ul', { class: 'mixer', 'aria-label': `混音（最多 ${MAX_MIX} 軌）` });
-  const stopAllBtn = el('button', { type: 'button', text: '全部停止' });
-  const mixBox = el('div', { hidden: true }, mixer, el('p', {}, stopAllBtn));
+  const stopAllBtn = el('button', { type: 'button', class: 'btn btn-ghost', text: '全部停止' });
+  const mixBox = el('div', { hidden: true }, el('p', { class: 'small', text: `混音：點選音源開關，最多同時 ${MAX_MIX} 軌。` }), mixer, el('p', { class: 'btn-row center' }, stopAllBtn));
   // 共用
   const vol = el('input', { type: 'range', id: 'audio-vol', min: '0', max: '1', step: '0.05' });
   vol.value = String(engine.volume);
   const timerSel = el('select', { id: 'audio-timer' },
     TIMER_OPTIONS.map((m) => el('option', { value: String(m), text: m ? `${m} 分鐘後關閉` : '不定時' })));
-  const status = el('p', { class: 'muted', 'aria-live': 'polite' });
+  const status = el('p', { class: 'small', 'aria-live': 'polite' });
 
   root.append(single, mixBox,
-    el('p', {}, el('label', { for: 'audio-vol', text: '總音量' }), ' ', vol),
-    el('p', {}, el('label', { for: 'audio-timer', text: '定時' }), ' ', timerSel),
+    el('p', { class: 'field' }, el('label', { for: 'audio-vol', text: '總音量' }), vol),
+    el('p', { class: 'field' }, el('label', { for: 'audio-timer', text: '定時關閉' }), timerSel),
     status);
 
   function fillTracks() {
@@ -47,7 +48,7 @@ export function initAudio(root = document.getElementById('audio')) {
     );
     if (byId.has(getSettings().audio.lastTrack)) trackSel.value = getSettings().audio.lastTrack;
     mixer.replaceChildren(...tracks.map((t) => {
-      const btn = el('button', { type: 'button', 'data-id': t.id, 'aria-pressed': 'false', text: t.name });
+      const btn = el('button', { type: 'button', class: 'btn btn-sm', 'data-id': t.id, 'aria-pressed': 'false', text: t.name });
       const v = el('input', { type: 'range', min: '0', max: '1', step: '0.05', 'aria-label': `${t.name} 音量`, 'data-vol': t.id });
       v.value = '1';
       btn.addEventListener('click', () => toggleMix(t, v));
@@ -64,6 +65,10 @@ export function initAudio(root = document.getElementById('audio')) {
     const active = new Set(on ? engine.activeIds : []);
     for (const b of mixer.querySelectorAll('button')) b.setAttribute('aria-pressed', String(active.has(b.dataset.id)));
     for (const v of mixer.querySelectorAll('input')) v.hidden = !active.has(v.dataset.vol);
+    // 首頁卡片的播放狀態
+    const names = [...active].map((id) => byId.get(id)?.name).filter(Boolean);
+    document.getElementById('noise-status').textContent = names.length ? `播放中・${names.join('＋')}` : '未播放';
+    document.getElementById('noise-dot').classList.toggle('on', names.length > 0);
     const left = Math.max(0, Math.ceil((engine.timerEnd - Date.now()) / 60000));
     status.textContent = on && engine.timerEnd ? `約 ${left} 分鐘後淡出關閉` : '';
   }
@@ -109,6 +114,7 @@ export function initAudio(root = document.getElementById('audio')) {
     mixToggle.checked = !!settings.audio.mixEnabled;
     mixToggle.addEventListener('change', () => { persist({ mixEnabled: mixToggle.checked }); setMixMode(mixToggle.checked); });
   }
+  document.getElementById('tile-noise').addEventListener('click', () => openSheet('noise'));
   setMixMode(!!settings.audio.mixEnabled);
   fillTracks();
 
