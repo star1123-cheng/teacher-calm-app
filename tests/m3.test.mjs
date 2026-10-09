@@ -1,12 +1,12 @@
-// M3 驗收：彩蛋計數、退休倒數、地獄設定驗證、噪音接縫、定時關閉、缺音檔
+// M3 驗收：彩蛋計數、退休倒數、地獄設定驗證、音檔接縫、定時關閉、缺音檔
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { installMockStorage, installMockAudio } from './helpers.mjs';
+import { installMockStorage, installMockAudio, TEST_TRACKS } from './helpers.mjs';
 installMockStorage();
 installMockAudio();
 const { createTapCounter } = await import('../js/egg.js');
 const { retireCountdown, validateHell, exampleHell } = await import('../js/hell-data.js');
-const { makeNoise, sanitizeManifest, AudioEngine, SYNTH_TRACKS, FADE_SECONDS } = await import('../js/audio.js');
+const { crossfadeLoop, sanitizeManifest, AudioEngine, FADE_SECONDS } = await import('../js/audio.js');
 
 test('彩蛋：3 秒內 5 下必定切換，第 4 秒才點第 5 下不切換', () => {
   const c = createTapCounter();
@@ -39,15 +39,12 @@ test('地獄設定：範例值合法、錯誤值擋下', () => {
   assert.ok(validateHell({ ...ex, edu: 'x' }));
 });
 
-test('噪音接縫：循環頭尾相接時沒有跳點', () => {
-  let seed = 1; const rng = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  for (const type of ['white', 'pink', 'brown']) {
-    const out = makeNoise(type, 8000, 2000, rng);
-    assert.equal(out.length, 8000);
-    const jump = Math.abs(out[0] - out[out.length - 1]);
-    const typical = out.slice(1).reduce((s, v, i) => s + Math.abs(v - out[i]), 0) / (out.length - 1);
-    assert.ok(jump < typical * 6 + 0.05, `${type} 接縫跳動 ${jump} 對比平均 ${typical}`);
-  }
+test('音檔接縫：交叉淡入後循環頭尾相接沒有跳點', () => {
+  // 0 到 109 的斜坡訊號，頭尾差很大；淡入 10 個取樣後，最後一點接回第一點應連續
+  const data = Float32Array.from({ length: 110 }, (_, i) => i);
+  const out = crossfadeLoop(data, 10);
+  assert.equal(out.length, 100);
+  assert.ok(Math.abs(out[0] - (out[99] + 1)) < 1e-6, `接縫 ${out[99]} → ${out[0]}`);
 });
 
 test('音檔清單：過濾不安全的檔名，缺清單時只有合成', () => {
@@ -59,7 +56,7 @@ test('音檔清單：過濾不安全的檔名，缺清單時只有合成', () =>
 test('定時關閉：到時前 3 秒淡出，時間到停止', async (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'Date'] });
   const e = new AudioEngine();
-  await e.play(SYNTH_TRACKS[0]);
+  await e.play(TEST_TRACKS[0]);
   assert.equal(e.channels.size, 1);
   e.setTimer(15 * 60000);
   t.mock.timers.tick(15 * 60000 - FADE_SECONDS * 1000 - 1);
@@ -70,7 +67,7 @@ test('定時關閉：到時前 3 秒淡出，時間到停止', async (t) => {
   t.mock.timers.tick(FADE_SECONDS * 1000);
   assert.equal(e.channels.size, 0);
   // 單軌：換音源會替換
-  await e.play(SYNTH_TRACKS[0]);
-  await e.play(SYNTH_TRACKS[1]);
-  assert.deepEqual(e.activeIds, ['synth:pink']);
+  await e.play(TEST_TRACKS[0]);
+  await e.play(TEST_TRACKS[1]);
+  assert.deepEqual(e.activeIds, ['file:sea.mp3']);
 });

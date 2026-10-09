@@ -2,7 +2,7 @@
 :root {
   --sp-pad: 20px; --sp-gap: 12px; --sp-card: 20px; --sp-inner: 8px;
   --r-card: 26px; --r-btn: 16px; --r-sheet: 30px; --r-bar: 999px;
-  --h-btn: 48px; --w-btn: 100%; --w-max: 560px;
+  --h-btn: 48px; --w-btn: 100%; --w-max: 560px; --pad-wm: 10px;
   --fs-label: 13px; --fs-title: 15px; --fs-quote: 15px; --fs-days: 96px; --fs-tile: 36px; --fs-hell-xl: 72px; --fs-hell-l: 34px;
   --rows-top: minmax(0, 1.7fr) minmax(0, 1fr);
   --cols-main: minmax(0, 1fr); --rows-main: minmax(0, 1fr) auto;
@@ -24,7 +24,7 @@
 }
 @media (min-width: 769px) {
   :root {
-    --sp-pad: 32px; --sp-gap: 20px; --sp-card: 32px; --h-btn: 52px; --w-btn: 360px; --w-max: 1200px;
+    --sp-pad: 32px; --sp-gap: 20px; --sp-card: 32px; --h-btn: 52px; --w-btn: 360px; --w-max: 1200px; --pad-wm: 0px;
     --fs-label: 14px; --fs-title: 17px; --fs-quote: 19px; --fs-days: 140px; --fs-tile: 48px; --fs-hell-xl: 112px; --fs-hell-l: 56px;
     --cols-main: minmax(0, 1fr) minmax(0, 1fr); --rows-main: minmax(0, 1fr); --rows-top: minmax(0, 1.5fr) minmax(0, 1fr);
     --cols-tiles: minmax(0, 1fr); --rows-tiles: minmax(0, 1fr) minmax(0, 1fr); --tile-ar: auto;
@@ -81,7 +81,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .layout {
   position: relative; box-sizing: border-box; height: 100%; width: 100%; max-width: var(--w-max); margin: 0 auto;
   display: grid; grid-template-rows: minmax(0, 1fr) var(--h-btn); gap: var(--sp-gap);
-  padding: calc(env(safe-area-inset-top) + var(--sp-pad)) var(--sp-pad) calc(env(safe-area-inset-bottom) + var(--sp-pad));
+  /* 底部多留一點給右下角的浮水印 */
+  padding: calc(env(safe-area-inset-top) + var(--sp-pad)) var(--sp-pad) calc(env(safe-area-inset-bottom) + var(--sp-pad) + var(--pad-wm));
 }
 .calm-grid { display: grid; grid-template-columns: var(--cols-main); grid-template-rows: var(--rows-main); gap: var(--sp-gap); min-height: 0; }
 .calm-top { display: grid; grid-template-rows: var(--rows-top); gap: var(--sp-gap); min-height: 0; }
@@ -108,6 +109,7 @@ button.card:focus-visible { outline: 2px solid var(--c-fill); outline-offset: 3p
 .card-quote { overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
 .quote-text { margin: 0; font-family: var(--f-serif); font-size: var(--fs-quote); line-height: 1.75; text-wrap: pretty; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .quote-meta { font-size: 12px; color: var(--c-ink-soft); }
+.quote-meta:empty { display: none; }
 
 button.tile { aspect-ratio: var(--tile-ar); display: flex; flex-direction: column; justify-content: space-between; }
 .tile-head { display: flex; flex-direction: column; gap: 14px; }
@@ -258,9 +260,18 @@ ul, ol { padding-left: 1.2em; }
 .draw-foot { font-size: 10px; color: #7a5a3e; }
 .sheet .draw-stage + .btn-row { margin-top: 4px; }
 
+/* 著作權浮水印：右下角、不擋點擊 */
+.watermark {
+  position: fixed; z-index: 5; margin: 0; pointer-events: none; user-select: none; -webkit-user-select: none;
+  right: calc(env(safe-area-inset-right) + 8px); bottom: calc(env(safe-area-inset-bottom) + 3px);
+  padding: 2px 9px; border-radius: var(--r-bar); background: rgba(84, 101, 112, .85); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em; line-height: 1.5;
+}
+@media (min-width: 769px) { .watermark { right: calc(env(safe-area-inset-right) + 14px); bottom: calc(env(safe-area-inset-bottom) + 8px); font-size: 11px; } }
+
 /* 提示訊息 */
 #toast {
-  position: fixed; inset: auto; margin: 0; border: 0; left: 50%; z-index: 30; bottom: calc(env(safe-area-inset-bottom) + var(--sp-pad) + var(--h-btn) + 14px);
+  position: fixed; inset: auto; margin: 0; border: 0; left: 50%; z-index: 30; bottom: calc(env(safe-area-inset-bottom) + var(--sp-pad) + var(--pad-wm) + var(--h-btn) + 14px);
   transform: translateX(-50%); max-width: calc(100% - 32px); box-sizing: border-box; padding: 8px 16px; border-radius: var(--r-bar);
   background: var(--c-toast); color: var(--c-toast-ink); font-size: 13px; letter-spacing: .06em; text-align: center;
   pointer-events: none; transition: opacity .3s ease; opacity: 0;

@@ -1,5 +1,5 @@
 // 白噪音介面：單軌（選擇音源＋播放）或混音（最多 2 軌、各自音量）；共用總音量與定時關閉
-import { AudioEngine, SYNTH_TRACKS, TIMER_OPTIONS, MAX_MIX, loadFileTracks } from './audio.js';
+import { AudioEngine, TIMER_OPTIONS, MAX_MIX, loadFileTracks } from './audio.js';
 import { getSettings, saveSettings } from './storage.js';
 import { el, toast } from './ui.js';
 import { openSheet } from './sheet.js';
@@ -9,9 +9,9 @@ export const engine = new AudioEngine();
 export function initAudio(root = document.getElementById('audio')) {
   const settings = getSettings();
   engine.volume = settings.audio.volume;
-  // 先顯示合成噪音，音檔清單檢查完再補上，避免拖慢首頁
-  const tracks = [...SYNTH_TRACKS];
-  const byId = new Map(tracks.map((t) => [t.id, t]));
+  // 音檔清單在背景檢查，避免拖慢首頁
+  const tracks = [];
+  const byId = new Map();
 
   const persist = (patch) => {
     const s = getSettings();
@@ -34,18 +34,19 @@ export function initAudio(root = document.getElementById('audio')) {
     TIMER_OPTIONS.map((m) => el('option', { value: String(m), text: m ? `${m} 分鐘後關閉` : '不定時' })));
   const status = el('p', { class: 'small', 'aria-live': 'polite' });
 
-  root.append(single, mixBox,
+  const emptyNote = el('p', { class: 'small', text: '還沒有音檔。把 mp3 放進 assets/audio/ 並登記在 manifest.json 後就會出現。' });
+  const controls = el('div', {}, single, mixBox,
     el('p', { class: 'field' }, el('label', { for: 'audio-vol', text: '總音量' }), vol),
     el('p', { class: 'field' }, el('label', { for: 'audio-timer', text: '定時關閉' }), timerSel),
     status);
+  root.append(emptyNote, controls);
 
   function fillTracks() {
-    const synth = tracks.filter((t) => t.synth);
-    const files = tracks.filter((t) => !t.synth);
-    trackSel.replaceChildren(
-      el('optgroup', { label: '合成' }, synth.map((t) => el('option', { value: t.id, text: t.name }))),
-      files.length ? el('optgroup', { label: '音檔' }, files.map((t) => el('option', { value: t.id, text: t.name }))) : null,
-    );
+    // 沒有音檔時只顯示說明，不顯示播放控制
+    const none = tracks.length === 0;
+    emptyNote.hidden = !none;
+    controls.hidden = none;
+    trackSel.replaceChildren(...tracks.map((t) => el('option', { value: t.id, text: t.name })));
     if (byId.has(getSettings().audio.lastTrack)) trackSel.value = getSettings().audio.lastTrack;
     mixer.replaceChildren(...tracks.map((t) => {
       const btn = el('button', { type: 'button', class: 'btn btn-sm', 'data-id': t.id, 'aria-pressed': 'false', text: t.name });
@@ -67,7 +68,7 @@ export function initAudio(root = document.getElementById('audio')) {
     for (const v of mixer.querySelectorAll('input')) v.hidden = !active.has(v.dataset.vol);
     // 首頁卡片的播放狀態
     const names = [...active].map((id) => byId.get(id)?.name).filter(Boolean);
-    document.getElementById('noise-status').textContent = names.length ? `播放中・${names.join('＋')}` : '未播放';
+    document.getElementById('noise-status').textContent = names.length ? `播放中・${names.join('＋')}` : (tracks.length ? '未播放' : '尚無音檔');
     document.getElementById('noise-dot').classList.toggle('on', names.length > 0);
     const left = Math.max(0, Math.ceil((engine.timerEnd - Date.now()) / 60000));
     status.textContent = on && engine.timerEnd ? `約 ${left} 分鐘後淡出關閉` : '';

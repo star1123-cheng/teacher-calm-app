@@ -11,7 +11,7 @@ let soupsCache = null;
 async function loadSoups() {
   if (soupsCache) return soupsCache;
   try {
-    const { records } = parseCSV(await (await fetch('seed/hell-soup.csv')).text());
+    const { records } = parseCSV(await (await fetch('seed/toxic-soup.csv')).text());
     soupsCache = records.slice(1).map((r) => (r.fields[0] || '').trim()).filter(Boolean)
       .map((text) => ({ id: hashId('s:', text), text }));
   } catch {

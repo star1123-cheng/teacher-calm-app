@@ -9,6 +9,7 @@ const { pickToday, advance } = await import('../js/rotation.js');
 const { parseQuotesCSV, toGroups, ORIGINAL } = await import('../js/quote.js');
 const { sortNotes, filterNotes, notesToText, validateNote } = await import('../js/notes.js');
 const { defaultSettings } = await import('../js/storage.js');
+const { parseCSV } = await import('../js/csv.js');
 
 test('倒數：預設值、驗證、到期、進度條', () => {
   const d = defaultSettings(new Date(2026, 9, 9));
@@ -65,8 +66,9 @@ test('句庫 CSV：範本筆數、逗號與換行、重複與錯誤行號', () =
   const g = toGroups(r.items, [{ id: 'o', author: ORIGINAL }]);
   assert.equal(g[0].length, 2); assert.equal(g[1].length, 2);
   assert.equal(parseQuotesCSV('a,b\n1,2').errors[0].line, 1);
-  const orig = parseQuotesCSV(readFileSync('seed/quotes-original.csv', 'utf8'));
-  assert.equal(orig.items.length, 90); assert.equal(orig.errors.length, 0);
+  const builtin = parseCSV(readFileSync('seed/daily-quotes.csv', 'utf8'));
+  assert.equal(builtin.error, null);
+  assert.equal(builtin.records.length - 1, 301);
 });
 
 test('工作紀要：排序、篩選、文字格式、空白不可新增', () => {

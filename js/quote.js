@@ -55,11 +55,12 @@ let originalsCache = null;
 export async function loadOriginals() {
   if (originalsCache) return originalsCache;
   try {
-    const res = await fetch('seed/quotes-original.csv');
+    // 內建句庫：排在作家句之後補位，畫面上不標出處
+    const res = await fetch('seed/daily-quotes.csv');
     const { records } = parseCSV(await res.text());
     originalsCache = records.slice(1)
       .filter((r) => r.fields[0]?.trim())
-      .map((r) => ({ id: hashId('o:', r.fields[0].trim()), text: r.fields[0].trim(), author: ORIGINAL, book: '', page: '' }));
+      .map((r) => ({ id: hashId('o:', r.fields[0].trim()), text: r.fields[0].trim(), author: ORIGINAL, book: '', page: '', builtin: true }));
   } catch {
     originalsCache = [];
   }
@@ -74,7 +75,7 @@ export function quoteMeta(q) {
 function renderQuoteCard(q) {
   const $ = (id) => document.getElementById(id);
   const text = q ? q.text : '句庫是空的。';
-  const meta = q ? `— ${quoteMeta(q)}` : '';
+  const meta = q && !q.builtin ? `— ${quoteMeta(q)}` : '';
   $('quote-text').textContent = text;
   $('quote-meta').textContent = meta;
   $('quote-full-text').textContent = text;
