@@ -29,3 +29,6 @@ tests/tmp/
 assets/audio/bgm_*.mp3
 assets/audio/sources.csv
 assets/audio/*.mid
+
+# 設計稿原始字型檔（7.3 MB，app 只用子集 assets/fonts/peak-subset.woff2）
+design/*.ttf

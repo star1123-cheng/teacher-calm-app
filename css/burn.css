@@ -4,6 +4,12 @@
   src: url(../assets/fonts/brush-subset.woff2) format("woff2");
   font-display: block;
 }
+/* 轉場文字字型：隨峰體（The Peak Font，SIL OFL 授權，見 assets/fonts/OFL-ThePeakFont.txt），只擷取兩行字用到的字 */
+@font-face {
+  font-family: "ThePeakFont";
+  src: url(../assets/fonts/peak-subset.woff2) format("woff2");
+  font-display: block;
+}
 .burn { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 900; touch-action: none; cursor: pointer; }
 /* 布幕蓋住畫面時直接換面，不播翻面動畫 */
 .mode-instant .flip-inner { transition: none !important; }
