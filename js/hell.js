@@ -5,6 +5,7 @@ import { switchMode } from './mode.js';
 import { todayISO } from './dates.js';
 import { el, toast } from './ui.js';
 import { initSalary } from './salary-ui.js';
+import { initSoup } from './soup.js';
 
 const renderers = new Set();
 export function onHellChange(fn) { renderers.add(fn); }
@@ -111,6 +112,7 @@ export function initHell() {
   view.append(setup, retire, salary, soup, el('p', {}, editBtn), editBox, el('p', {}, tired));
 
   let salaryUI = null;
+  let soupUI = null;
   const render = async (h) => {
     const has = !!h;
     retire.hidden = !has; salary.hidden = !has; soup.hidden = !has;
@@ -118,6 +120,8 @@ export function initHell() {
     renderRetire(retire, h);
     if (!salaryUI) salaryUI = await initSalary(salary, { onToggle: notify });
     else salaryUI.render();
+    if (!soupUI) soupUI = await initSoup(soup);
+    else soupUI.render();
   };
   onHellChange(render);
 
