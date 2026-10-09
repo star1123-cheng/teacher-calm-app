@@ -1,5 +1,6 @@
 // 備份匯出與匯入：單一 JSON，包含所有 tcalm: 鍵、匯出時間與 schema 版本。
 import { KEYS, ALL_KEYS, snapshot, replaceAll } from './storage.js';
+import { validateHell } from './hell-data.js';
 
 export const APP_ID = 'teacher-calm-app';
 export const SCHEMA_VERSION = 1;
@@ -37,7 +38,7 @@ const validators = {
     const bad = v.findIndex((x) => !isObj(x) || !isStr(x.id) || !isDate(x.date) || !NOTE_TAGS.includes(x.tag) || !isStr(x.text) || !x.text || typeof x.done !== 'boolean');
     return bad >= 0 ? `工作紀要第 ${bad + 1} 筆欄位錯誤` : null;
   },
-  [KEYS.hell]: (v) => (isObj(v) ? null : '地獄模式設定格式錯誤'),
+  [KEYS.hell]: validateHell,
 };
 
 export function buildBackup(now = new Date()) {

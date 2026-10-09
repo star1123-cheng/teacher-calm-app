@@ -21,3 +21,17 @@ export function installMockStorage(limitChars = Infinity) {
   Object.defineProperty(globalThis, 'localStorage', { value: store, configurable: true, writable: true });
   return store;
 }
+
+// 假的 AudioContext：只記錄呼叫，用來測試播放邏輯與定時關閉
+export function installMockAudio() {
+  const param = () => ({ value: 1, events: [], cancelScheduledValues() {}, setValueAtTime(v) { this.value = v; }, linearRampToValueAtTime(v, t) { this.events.push(['ramp', v, t]); }, setTargetAtTime(v) { this.value = v; } });
+  class Node { connect(n) { return n; } disconnect() {} }
+  class Ctx {
+    constructor() { this.state = 'running'; this.currentTime = 0; this.sampleRate = 8000; this.destination = new Node(); }
+    resume() { this.state = 'running'; return Promise.resolve(); }
+    createGain() { const n = new Node(); n.gain = param(); return n; }
+    createBuffer(ch, len, rate) { return { length: len, sampleRate: rate, copyToChannel() {} }; }
+    createBufferSource() { const n = new Node(); n.started = false; n.stopped = false; n.start = () => { n.started = true; }; n.stop = () => { n.stopped = true; }; return n; }
+  }
+  globalThis.AudioContext = Ctx;
+}

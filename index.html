@@ -33,6 +33,7 @@
       <section id="countdown" aria-labelledby="h-countdown"><h3 id="h-countdown">時光倒數</h3></section>
       <section id="quote" aria-labelledby="h-quote"><h3 id="h-quote">一日一句</h3></section>
       <section id="audio" aria-labelledby="h-audio"><h3 id="h-audio">白噪音</h3></section>
+      <p><button type="button" id="btn-happy" class="mode-btn">我很快樂</button></p>
     </section>
 
     <section id="view-notes" hidden aria-labelledby="h-notes">
@@ -44,6 +45,18 @@
 
       <section id="quote-import" aria-labelledby="h-quote-import">
         <h3 id="h-quote-import">一日一句句庫（作家句）</h3>
+      </section>
+
+      <section aria-labelledby="h-audio-note">
+        <h3 id="h-audio-note">白噪音</h3>
+        <p>iPhone／iPad 螢幕鎖定或切換到其他 App 後，系統可能會暫停網頁的聲音，無法保證背景播放。</p>
+        <p>自備音檔請放在 <code>assets/audio/</code>，並登記在 <code>assets/audio/manifest.json</code>。</p>
+      </section>
+
+      <section id="hell-settings" hidden aria-labelledby="h-hell-settings">
+        <h3 id="h-hell-settings">退休與薪資資料</h3>
+        <p class="muted">只存在這台裝置。</p>
+        <div id="hell-settings-form"></div>
       </section>
 
       <section aria-labelledby="h-backup">
@@ -77,6 +90,7 @@
     </form>
   </dialog>
 
+  <div id="transition" hidden aria-hidden="true"></div>
   <div id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

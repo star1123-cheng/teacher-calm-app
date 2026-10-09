@@ -15,3 +15,20 @@ button { min-height: 2.75rem; }
 #toast:not(:empty) { padding: .75rem 1rem; background: Canvas; border: 2px solid; }
 .error { color: #b00020; }
 progress { width: 100%; }
+.badge { display: inline-block; border: 1px solid; padding: 0 .5rem; font-size: .875rem; }
+
+/* 彩蛋微提示：第 3 下起輕微抖動；減少動態時改成外框提示 */
+@keyframes tcalm-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+.mode-btn.hint { animation: tcalm-shake .3s ease-in-out 2; }
+
+/* 模式轉場：約 1 秒，畫面變暗變紅 */
+#transition { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity .5s ease; z-index: 10; }
+#transition.to-hell { background: #3a0000; }
+#transition.to-quiet { background: #000; }
+#transition.on { opacity: 1; }
+body.mode-hell { background: #1a0606; color: #f4e9e6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mode-btn.hint { animation: none; outline: 2px dashed currentColor; outline-offset: 3px; }
+  #transition { transition: none; }
+}

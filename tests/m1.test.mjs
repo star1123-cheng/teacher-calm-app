@@ -10,7 +10,7 @@ function seedData() {
   save(KEYS.settings, { version: 1, countdown: { start: '2026-01-01', end: '2026-12-31' }, audio: { mixEnabled: false, volume: 0.5, lastTrack: null } });
   save(KEYS.quotes, [{ id: 'q1', text: '含,逗號\n與"引號"', author: '作者甲', book: '', page: '' }]);
   save(KEYS.notes, [{ id: 'n1', date: '2026-10-09', tag: '網管', text: '更新交換器', done: true }]);
-  save(KEYS.hell, { retireDate: '2040-07-31', edu: 'master', level: 20 });
+  save(KEYS.hell, { retireDate: '2040-07-31', edu: 'master', level: 20, toggles: { research: true, homeroom: true, leader: false }, overrides: { research: null, homeroom: 4000, leader: null }, annualRaise: 0, promoteDate: '08-01', tallyStart: '2026-01-01' });
 }
 
 test('匯出再匯入後資料完全一致', () => {
