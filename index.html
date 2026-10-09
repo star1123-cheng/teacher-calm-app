@@ -6,7 +6,7 @@
   <!-- 只允許載入同源檔案：零外部請求，也擋下注入的外部腳本 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
-  <title>教師寧靜</title>
+  <title>寧靜時光</title>
   <meta name="theme-color" content="#e9eef6">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon-32.png" sizes="32x32">
@@ -14,9 +14,35 @@
   <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="教師寧靜">
+  <meta name="apple-mobile-web-app-title" content="寧靜時光">
   <link rel="stylesheet" href="css/base.css">
+  <!-- 背景圖提早下載，不用等 CSS 解析完才開始 -->
+  <link rel="preload" as="image" href="assets/img/calm-bg-mobile-day.webp" media="(max-width: 768px)">
+  <link rel="preload" as="image" href="assets/img/calm-bg-desktop-day.webp" media="(min-width: 769px)">
   <script type="module" src="js/app.js"></script>
+  <!-- 一次預先下載所有模組，避免 import 一層等一層造成白畫面 -->
+  <link rel="modulepreload" href="js/storage.js">
+  <link rel="modulepreload" href="js/ui.js">
+  <link rel="modulepreload" href="js/sheet.js">
+  <link rel="modulepreload" href="js/theme.js">
+  <link rel="modulepreload" href="js/settings.js">
+  <link rel="modulepreload" href="js/backup.js">
+  <link rel="modulepreload" href="js/csv.js">
+  <link rel="modulepreload" href="js/countdown.js">
+  <link rel="modulepreload" href="js/dates.js">
+  <link rel="modulepreload" href="js/quote.js">
+  <link rel="modulepreload" href="js/rotation.js">
+  <link rel="modulepreload" href="js/notes.js">
+  <link rel="modulepreload" href="js/audio-ui.js">
+  <link rel="modulepreload" href="js/audio.js">
+  <link rel="modulepreload" href="js/bgm.js">
+  <link rel="modulepreload" href="js/hell.js">
+  <link rel="modulepreload" href="js/hell-data.js">
+  <link rel="modulepreload" href="js/egg.js">
+  <link rel="modulepreload" href="js/mode.js">
+  <link rel="modulepreload" href="js/salary.js">
+  <link rel="modulepreload" href="js/salary-ui.js">
+  <link rel="modulepreload" href="js/soup.js">
 </head>
 <body>
 <div id="app">
@@ -152,7 +178,7 @@
 
       <section aria-labelledby="h-audio-note">
         <h3 id="h-audio-note">白噪音</h3>
-        <p><label class="check"><input type="checkbox" id="bgm-enabled"> 背景音樂（每次開啟與切換模式時隨機播放，播白噪音時自動暫停）</label></p>
+        <p><label class="check"><input type="checkbox" id="bgm-enabled"> 背景音樂（每次開啟與切換模式時隨機挑一首循環播放，播白噪音時自動暫停）</label></p>
         <p><label class="check"><input type="checkbox" id="mix-enabled"> 開啟混音（最多同時播放 2 軌，各自調音量）</label></p>
         <p class="small">iPhone／iPad 螢幕鎖定或切換到其他 App 後，系統可能會暫停網頁的聲音，無法保證背景播放。</p>
         <p class="small">自備音檔請放在 <code>assets/audio/</code>，並登記在 <code>assets/audio/manifest.json</code>。</p>

@@ -1,6 +1,6 @@
 // Service worker：快取所有靜態檔，斷網可完整使用。
 // 修改任何檔案後請把 VERSION 加 1，讓使用者裝置更新快取。
-const VERSION = 'tcalm-v14';
+const VERSION = 'tcalm-v16';
 const PRECACHE = [
   './',
   './index.html',
@@ -62,7 +62,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
-  if (req.headers.has('range')) { e.respondWith(rangeResponse(req)); return; }
+  if (req.headers.has('range')) { e.respondWith(rangeResponse(req, e)); return; }
   e.respondWith((async () => {
     const cache = await caches.open(VERSION);
     const cached = await cache.match(req, { ignoreSearch: true });
@@ -80,21 +80,45 @@ self.addEventListener('fetch', (e) => {
 });
 
 // 背景音樂用 <audio> 播放，瀏覽器會分段（Range）讀取；iPhone 一定要收到 206 分段回應才肯播。
-// 第一次先下載整檔存進快取，之後從快取切出要的那一段，離線也能播。
-async function rangeResponse(req) {
+// 還沒快取時直接交給網路串流（邊下載邊播，不用等整檔），同時在背景下載整檔存進快取；
+// 之後從快取切出要的那一段，離線也能播。整檔只讀進記憶體一次，避免每段都重讀造成卡頓。
+const audioBuffers = new Map(); // url → Promise<{ buf, type }>
+const downloading = new Map(); // url → Promise
+
+function cacheInBackground(url) {
+  if (downloading.has(url)) return downloading.get(url);
+  const p = (async () => {
+    const res = await fetch(url);
+    if (res.ok && res.status === 200) await (await caches.open(VERSION)).put(url, res);
+  })().catch(() => {}).finally(() => downloading.delete(url));
+  downloading.set(url, p);
+  return p;
+}
+
+function loadBuffer(url, res) {
+  if (!audioBuffers.has(url)) {
+    const p = res.arrayBuffer().then((buf) => ({ buf, type: res.headers.get('Content-Type') || 'audio/mpeg' }));
+    p.catch(() => audioBuffers.delete(url));
+    audioBuffers.set(url, p);
+  }
+  return audioBuffers.get(url);
+}
+
+async function rangeResponse(req, e) {
+  const url = new URL(req.url);
+  url.search = '';
+  const key = url.href;
   const cache = await caches.open(VERSION);
-  let res = await cache.match(req.url, { ignoreSearch: true });
-  if (!res) {
+  const res = audioBuffers.has(key) ? null : await cache.match(key);
+  if (!audioBuffers.has(key) && !res) {
+    e.waitUntil(cacheInBackground(key));
     try {
-      const full = await fetch(req.url);
-      if (!full.ok || full.status !== 200) return full;
-      await cache.put(req.url, full.clone());
-      res = full;
+      return await fetch(req);
     } catch {
       return new Response('', { status: 504, statusText: 'offline' });
     }
   }
-  const buf = await res.arrayBuffer();
+  const { buf, type } = await loadBuffer(key, res);
   const size = buf.byteLength;
   const m = /bytes=(\d*)-(\d*)/.exec(req.headers.get('range') || '');
   let start = 0;
@@ -105,7 +129,7 @@ async function rangeResponse(req) {
   return new Response(buf.slice(start, end + 1), {
     status: 206,
     headers: {
-      'Content-Type': res.headers.get('Content-Type') || 'audio/mpeg',
+      'Content-Type': type,
       'Content-Range': `bytes ${start}-${end}/${size}`,
       'Content-Length': String(end - start + 1),
       'Accept-Ranges': 'bytes',

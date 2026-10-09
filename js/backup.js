@@ -52,7 +52,7 @@ export function buildBackup(now = new Date()) {
 
 // 驗證備份內容；全部通過才回傳 ok
 export function validateBackup(obj) {
-  if (!isObj(obj) || obj.app !== APP_ID) return { ok: false, error: '這不是教師寧靜 app 的備份檔。' };
+  if (!isObj(obj) || obj.app !== APP_ID) return { ok: false, error: '這不是寧靜時光的備份檔。' };
   if (!Number.isInteger(obj.schema)) return { ok: false, error: '備份檔缺少版本資訊。' };
   if (obj.schema < SCHEMA_VERSION) return { ok: false, error: `備份檔版本太舊（第 ${obj.schema} 版），目前只接受第 ${SCHEMA_VERSION} 版。` };
   if (obj.schema > SCHEMA_VERSION) return { ok: false, error: `備份檔來自較新的版本（第 ${obj.schema} 版），請先更新 app。` };
