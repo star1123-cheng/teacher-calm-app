@@ -1,6 +1,6 @@
 // Service worker：快取所有靜態檔，斷網可完整使用。
 // 修改任何檔案後請把 VERSION 加 1，讓使用者裝置更新快取。
-const VERSION = 'tcalm-v20';
+const VERSION = 'tcalm-v21';
 // 音檔另外放一個快取，改版時不會被清掉（名稱要和 js/audio.js 的 AUDIO_CACHE 一致）
 // 音檔內容要更換時請改檔名，舊檔會在下次開啟時自動從快取刪除
 const AUDIO_CACHE = 'tcalm-audio-v1';

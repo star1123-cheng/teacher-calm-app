@@ -118,6 +118,17 @@ export function initAudio({ root = document.getElementById('audio') } = {}) {
     mixToggle.addEventListener('change', () => { persist({ mixEnabled: mixToggle.checked }); setMixMode(mixToggle.checked); });
   }
   document.getElementById('tile-noise').addEventListener('click', () => openSheet('noise'));
+
+  // 設定面板：音檔下載進度
+  const cacheBar = document.getElementById('audio-cache-bar');
+  const cacheText = document.getElementById('audio-cache-text');
+  document.addEventListener('tcalm:audio-cache', ({ detail: d }) => {
+    if (!cacheBar || !cacheText) return;
+    cacheBar.value = d.total ? Math.round(((d.done + d.fraction) / d.total) * 100) : 100;
+    if (!d.finished) cacheText.textContent = `下載中 ${d.done} / ${d.total}：${d.current} ${Math.round(d.fraction * 100)}%`;
+    else if (d.failed) cacheText.textContent = `有 ${d.failed} 個音檔沒下載成功，需要連網才能播放；下次開啟會再試。`;
+    else cacheText.textContent = `全部 ${d.total} 個音檔都已下載，可立即播放，斷網也能聽。`;
+  });
   setMixMode(!!settings.audio.mixEnabled);
   fillTracks();
 

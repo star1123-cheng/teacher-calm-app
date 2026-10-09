@@ -43,17 +43,55 @@ export const AUDIO_CACHE = 'tcalm-audio-v1';
 
 // 在背景一次一首把音檔存進離線快取：之後點播放直接從手機讀、斷網也能播
 // 不在清單上的舊音檔順便刪掉，避免佔空間
-export async function warmAudioCache(files) {
-  if (!globalThis.caches) return;
+// items：[{ file, name }]；每有進度就送出 tcalm:audio-cache 事件（設定面板的進度條用）
+export async function warmAudioCache(items) {
+  const state = { total: items.length, done: 0, failed: 0, current: '', fraction: 0, finished: false };
+  const emit = () => document.dispatchEvent(new CustomEvent('tcalm:audio-cache', { detail: { ...state } }));
+  if (!globalThis.caches) { state.finished = true; state.failed = items.length; emit(); return; }
   try {
     const cache = await caches.open(AUDIO_CACHE);
-    const want = new Set(files.map((f) => new URL(`assets/audio/${f}`, location.href).href));
+    const urlOf = (f) => new URL(`assets/audio/${f}`, location.href).href;
+    const want = new Set(items.map((it) => urlOf(it.file)));
     for (const req of await cache.keys()) if (!want.has(req.url)) await cache.delete(req);
-    for (const url of want) {
-      if (await cache.match(url)) continue;
-      try { await cache.add(url); } catch { /* 網路不通就下次再存 */ }
+    for (const it of items) {
+      const url = urlOf(it.file);
+      state.current = it.name;
+      state.fraction = 0;
+      if (!(await cache.match(url))) {
+        emit();
+        try { await download(cache, url, (f) => { state.fraction = f; emit(); }); } catch { state.failed++; }
+      }
+      state.done++;
+      state.fraction = 0;
+      emit();
     }
-  } catch { /* 瀏覽器不給用快取（例如私密模式）就算了，照樣可以線上播 */ }
+  } catch {
+    state.failed = state.total - state.done; // 瀏覽器不給用快取（例如私密模式）：照樣可以線上播
+  }
+  state.finished = true;
+  state.current = '';
+  emit();
+}
+
+// 邊下載邊回報百分比，下載完整個檔案才存進快取
+async function download(cache, url, onFraction) {
+  const res = await fetch(url);
+  if (!res.ok || !res.body) throw new Error('missing');
+  const total = Number(res.headers.get('content-length')) || 0;
+  const reader = res.body.getReader();
+  const chunks = [];
+  let loaded = 0;
+  let lastEmit = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    loaded += value.length;
+    const now = Date.now();
+    if (total && now - lastEmit > 150) { lastEmit = now; onFraction(Math.min(1, loaded / total)); }
+  }
+  const blob = new Blob(chunks, { type: 'audio/mpeg' });
+  await cache.put(url, new Response(blob, { headers: { 'Content-Type': 'audio/mpeg', 'Content-Length': String(blob.size) } }));
 }
 
 export class AudioEngine {

@@ -102,6 +102,11 @@ button.card:focus-visible { outline: 2px solid var(--c-fill); outline-offset: 3p
 .num-days { font-size: var(--fs-days); }
 .cd-foot { display: flex; flex-direction: column; gap: var(--sp-inner); }
 .bar { display: block; height: 2px; border-radius: var(--r-bar); background: var(--c-track); overflow: hidden; }
+.audio-cache progress { width: 100%; height: 6px; border: 0; border-radius: var(--r-bar); background: var(--c-track); color: var(--c-fill); appearance: none; -webkit-appearance: none; overflow: hidden; }
+.audio-cache progress::-webkit-progress-bar { background: var(--c-track); border-radius: var(--r-bar); }
+.audio-cache progress::-webkit-progress-value { background: var(--c-fill); border-radius: var(--r-bar); transition: width .2s; }
+.audio-cache progress::-moz-progress-bar { background: var(--c-fill); border-radius: var(--r-bar); }
+.audio-cache .small { margin: 0; }
 .bar-fill { display: block; height: 100%; width: 0; background: var(--c-fill); border-radius: var(--r-bar); }
 .cd-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--c-ink-soft); }
 .card-countdown.is-done .num-days { font-size: calc(var(--fs-days) * .5); letter-spacing: .1em; }

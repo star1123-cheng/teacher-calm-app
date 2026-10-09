@@ -84,9 +84,10 @@ export function initBgm() {
       current = pickRandom(files, null);
       if (!current || !enabled()) return null;
       sync();
-      // 緩衝到可以開始播（或載入失敗）就算準備好
+      // 緩衝到可以開始播（或載入失敗）就算準備好；iPhone 點擊前不會緩衝，所以最多等 2.5 秒
       return new Promise((resolve) => {
         if (audio.readyState >= 3) { resolve(); return; }
+        setTimeout(resolve, 2500);
         audio.addEventListener('canplay', resolve, { once: true });
         audio.addEventListener('error', resolve, { once: true });
       });

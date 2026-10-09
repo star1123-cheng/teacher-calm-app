@@ -36,14 +36,20 @@ initSettings({ onImported: () => setTimeout(() => location.reload(), 800) });
 initCountdown();
 initQuote();
 initNotes();
-// 背景音樂在開場動畫期間先緩衝開頭；開場結束 3 秒後，再把所有音檔一首一首存進離線快取
+// 背景音樂在開場動畫期間先緩衝開頭；緩衝好之後，馬上在背景把所有音檔一首一首存進離線快取
+// 順序：背景音樂 → 上次用的白噪音 → 其他白噪音
 const bgm = initBgm();
 initAudio();
 initSplash(bgm.ready);
-document.addEventListener('tcalm:splash-done', () => setTimeout(async () => {
+bgm.ready.then(async () => {
   const json = await fetch('assets/audio/manifest.json').then((r) => r.json()).catch(() => null);
-  warmAudioCache([...sanitizeBgm(json), ...sanitizeManifest(json).map((t) => t.file)]);
-}, 3000), { once: true });
+  const last = getSettings().audio.lastTrack;
+  const noise = sanitizeManifest(json).sort((a, b) => (b.id === last) - (a.id === last));
+  warmAudioCache([
+    ...sanitizeBgm(json).map((file, i) => ({ file, name: `背景音樂 ${i + 1}` })),
+    ...noise.map((t) => ({ file: t.file, name: t.name })),
+  ]);
+});
 initHell();
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {

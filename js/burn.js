@@ -92,17 +92,20 @@ function layout(w, h) {
   let size;
   let seal;
   if (vertical) {
-    size = Math.min((h * 0.68) / count, w * 0.17);
+    // 整塊字（兩行錯開＋下方印章）只放在中間 3/5，上下各留 1/5 空白
+    // 高度約為：字距 × (count - 1) ＋ 第一個字半格 ＋ 第二行錯開 ＋ 最後一字到印章底
+    const span = 1.03 * (count - 1) + 0.5 + 0.55 + 1.2 + 0.6 + 0.1;
+    size = Math.min((h * 0.6) / span, w * 0.15);
     const step = size * 1.03;
     const gap = size * 1.55;
-    const top = (h - step * count) / 2 - size * 0.25;
+    const top = (h - span * size) / 2;
     LINES.forEach((line, i) => {
       const x = w / 2 + (i === 0 ? gap / 2 : -gap / 2);
       const y0 = top + (i ? size * 0.55 : 0) + size / 2; // 第二行稍微往下錯開，像真的寫字
       [...line].forEach((ch, j) => chars.push({ ch, x, y: y0 + j * step }));
     });
     const last = chars.at(-1);
-    seal = { x: last.x, y: Math.min(h - size * 0.7, last.y + size * 1.45) };
+    seal = { x: last.x, y: last.y + size * 1.2 };
   } else {
     size = Math.min((w * 0.76) / (count + 0.6), h * 0.11);
     const step = size * 1.03;

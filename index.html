@@ -245,6 +245,11 @@
         <h3 id="h-audio-note">白噪音</h3>
         <p><label class="check"><input type="checkbox" id="bgm-enabled"> 背景音樂（每次開啟與切換模式時隨機挑一首循環播放，播白噪音時自動暫停）</label></p>
         <p><label class="check"><input type="checkbox" id="mix-enabled"> 開啟混音（最多同時播放 2 軌，各自調音量）</label></p>
+        <div class="field audio-cache">
+          <label for="audio-cache-bar">音檔下載（下載完成後點播放立即出聲，斷網也能聽）</label>
+          <progress id="audio-cache-bar" max="100" value="0"></progress>
+          <p id="audio-cache-text" class="small" aria-live="polite">等待開始⋯</p>
+        </div>
         <p class="small">iPhone／iPad 螢幕鎖定或切換到其他 App 後，系統可能會暫停網頁的聲音，無法保證背景播放。</p>
         <p class="small">自備音檔請放在 <code>assets/audio/</code>，並登記在 <code>assets/audio/manifest.json</code>。</p>
       </section>
