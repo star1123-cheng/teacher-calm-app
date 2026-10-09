@@ -1,0 +1,153 @@
+/* 開場動畫「A Moment of Peace」：7 秒，夜空轉為黎明，太陽升起、圓相一筆畫成、水面倒影與漣漪、標題逐字浮現 */
+/* 各元素的基本樣式就是動畫結束時的樣子；開啟「減少動態效果」時直接顯示完成畫面 */
+
+.splash {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; color: #fffaf3; background: #141a36;
+  cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: opacity .8s ease, transform .8s cubic-bezier(.3, .7, .2, 1);
+  /* 保險：程式沒載入時，14 秒後自己消失 */
+  animation: sp-failsafe .8s 14s both;
+}
+.splash.splash-out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+@keyframes sp-failsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+
+/* 天空：夜色 → 黎明 */
+.sp-sky, .sp-dawn, .sp-glow { position: absolute; inset: -2%; pointer-events: none; }
+.sp-sky { background: linear-gradient(180deg, #0d1230 0%, #1b2350 55%, #2c3466 100%); }
+.sp-dawn {
+  background: linear-gradient(180deg, #1f2a52 0%, #4d4f80 34%, #a07f9f 58%, #e7b3a6 78%, #f6d4bb 100%);
+  animation: sp-fade-in 3.6s .2s cubic-bezier(.4, 0, .2, 1) both;
+}
+.sp-glow {
+  background: radial-gradient(60% 42% at 50% 44%, rgba(255, 214, 180, .55), rgba(255, 214, 180, 0) 70%);
+  animation: sp-glow 4s 1s ease-out both;
+}
+@keyframes sp-fade-in { from { opacity: 0; } }
+@keyframes sp-glow { from { opacity: 0; transform: scale(.7); } }
+
+/* 版面 */
+.sp-center { position: relative; display: flex; flex-direction: column; align-items: center; padding: 0 16px; transform: translateY(-3vh); }
+.sp-mark { width: min(92vw, 460px, 62vh); height: auto; overflow: visible; animation: sp-breathe 7s cubic-bezier(.3, .6, .3, 1) both; }
+@keyframes sp-breathe { from { transform: scale(.94); } }
+.sp-mark * { transform-box: fill-box; transform-origin: center; }
+
+/* 星星：一閃一閃後隨天亮淡去 */
+.sp-stars { opacity: 0; animation: sp-stars 3.2s ease-in-out both; }
+@keyframes sp-stars { 0% { opacity: 0; } 18% { opacity: .9; } 40% { opacity: .5; } 55% { opacity: .85; } 100% { opacity: 0; } }
+
+/* 地平線：從中央向兩側展開 */
+.sp-horizon { opacity: .85; animation: sp-horizon 1.6s .3s cubic-bezier(.6, 0, .2, 1) both; }
+@keyframes sp-horizon { from { transform: scaleX(0); opacity: 0; } }
+
+/* 太陽升起 */
+.sp-rise { animation: sp-rise 2.6s .7s cubic-bezier(.25, .7, .25, 1) both; }
+@keyframes sp-rise { from { transform: translateY(64px); } }
+.sp-halo { animation: sp-halo 4s 3.3s ease-in-out infinite alternate; }
+@keyframes sp-halo { to { transform: scale(1.12); opacity: .75; } }
+
+/* 水面倒影：慢慢浮現後輕輕閃動 */
+.sp-reflect { animation: sp-reflect 1.8s 1.2s ease-out both; }
+@keyframes sp-reflect { from { opacity: 0; transform: scaleY(.3); } }
+.sp-wave { animation: sp-shimmer 2.4s ease-in-out infinite alternate; }
+.sp-wave:nth-child(2) { animation-duration: 2s; animation-delay: -.6s; }
+.sp-wave:nth-child(3) { animation-duration: 2.8s; animation-delay: -1.1s; }
+.sp-wave:nth-child(4) { animation-duration: 1.8s; animation-delay: -.3s; }
+.sp-wave:nth-child(5) { animation-duration: 2.2s; animation-delay: -1.4s; }
+.sp-wave:nth-child(6) { animation-duration: 2.6s; animation-delay: -.9s; }
+@keyframes sp-shimmer { to { transform: scaleX(.78) translateX(2px); } }
+
+/* 漣漪 */
+.sp-ripple { opacity: 0; animation: sp-ripple 3.6s 2.4s cubic-bezier(.2, .6, .3, 1) infinite; }
+.sp-ripple:nth-child(2) { animation-delay: 3.6s; }
+.sp-ripple:nth-child(3) { animation-delay: 4.8s; }
+@keyframes sp-ripple { 0% { opacity: .55; transform: scale(.6); } 100% { opacity: 0; transform: scale(2.3); } }
+
+/* 圓相：先點下墨點，再一筆畫完 */
+.sp-ink { animation: sp-ink .5s 1.5s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes sp-ink { from { transform: scale(0); opacity: 0; } }
+.sp-stroke { stroke-dasharray: 1; }
+.sp-stroke-1 { opacity: .95; animation: sp-draw 2.1s 1.6s cubic-bezier(.55, .05, .3, 1) both; }
+.sp-stroke-2 { opacity: .5; animation: sp-draw 2s 1.72s cubic-bezier(.55, .05, .3, 1) both; }
+.sp-stroke-3 { opacity: .35; animation: sp-draw 2.2s 1.84s cubic-bezier(.55, .05, .3, 1) both; }
+@keyframes sp-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.sp-enso { filter: drop-shadow(0 0 6px rgba(255, 236, 220, .35)); }
+
+/* 遠方的鳥 */
+.sp-birds { opacity: 0; animation: sp-birds 4.6s 2.4s cubic-bezier(.3, .2, .4, 1) both; }
+@keyframes sp-birds { 0% { opacity: 0; transform: translate(-20px, 8px); } 25% { opacity: .9; } 100% { opacity: .7; transform: translate(70px, -12px); } }
+.sp-bird { animation: sp-flap .9s ease-in-out infinite alternate; }
+.sp-bird-2 { animation-duration: 1.1s; animation-delay: -.4s; }
+@keyframes sp-flap { to { transform: scaleY(.45); } }
+
+/* 標題逐字浮現 */
+.sp-title {
+  margin: 4px 0 0; font-family: "Cormorant Garamond", Didot, "Bodoni 72", Georgia, "Times New Roman", serif;
+  font-weight: 400; font-size: clamp(28px, 7.6vw, 46px); letter-spacing: .03em; line-height: 1.15; text-align: center;
+  text-shadow: 0 0 18px rgba(255, 225, 200, .45);
+}
+.sp-title span { display: inline-block; animation: sp-letter 1.1s cubic-bezier(.2, .7, .2, 1) both; }
+.sp-title .it { font-style: italic; }
+@keyframes sp-letter { from { opacity: 0; transform: translateY(.45em); filter: blur(6px); } }
+.sp-title span:nth-child(1) { animation-delay: 2.9s; }
+.sp-title span:nth-child(2) { animation-delay: 3.05s; }
+.sp-title span:nth-child(3) { animation-delay: 3.12s; }
+.sp-title span:nth-child(4) { animation-delay: 3.19s; }
+.sp-title span:nth-child(5) { animation-delay: 3.26s; }
+.sp-title span:nth-child(6) { animation-delay: 3.33s; }
+.sp-title span:nth-child(7) { animation-delay: 3.4s; }
+.sp-title span:nth-child(8) { animation-delay: 3.55s; }
+.sp-title span:nth-child(9) { animation-delay: 3.62s; }
+.sp-title span:nth-child(10) { animation-delay: 3.77s; }
+.sp-title span:nth-child(11) { animation-delay: 3.84s; }
+.sp-title span:nth-child(12) { animation-delay: 3.91s; }
+.sp-title span:nth-child(13) { animation-delay: 3.98s; }
+.sp-title span:nth-child(14) { animation-delay: 4.05s; }
+
+/* 中文副標，左右細線向外展開 */
+.sp-sub {
+  display: flex; align-items: center; gap: 14px; margin: 14px 0 0;
+  font-family: "Songti TC", "Noto Serif TC", "PMingLiU", serif; font-size: 15px; letter-spacing: .55em; text-indent: .55em;
+  color: rgba(255, 250, 244, .95); text-shadow: 0 1px 8px rgba(80, 50, 90, .35); animation: sp-sub 1.4s 4.4s ease-out both;
+}
+.sp-sub::before, .sp-sub::after { content: ""; width: 28px; height: 1px; background: currentColor; opacity: .6; animation: sp-line 1.2s 4.6s cubic-bezier(.6, 0, .2, 1) both; }
+@keyframes sp-sub { from { opacity: 0; letter-spacing: .9em; } }
+@keyframes sp-line { from { transform: scaleX(0); } }
+
+/* 飄浮光點 */
+.sp-motes { position: absolute; inset: 0; pointer-events: none; }
+.sp-motes i {
+  position: absolute; bottom: -10px; width: 4px; height: 4px; border-radius: 50%;
+  background: #ffe6c8; box-shadow: 0 0 8px 2px rgba(255, 220, 180, .6); opacity: 0;
+  animation: sp-mote 7s linear infinite;
+}
+.sp-motes i:nth-child(1) { left: 12%; animation-delay: 1.4s; animation-duration: 8s; }
+.sp-motes i:nth-child(2) { left: 24%; animation-delay: 2.6s; width: 3px; height: 3px; }
+.sp-motes i:nth-child(3) { left: 36%; animation-delay: 1.9s; animation-duration: 9s; }
+.sp-motes i:nth-child(4) { left: 47%; animation-delay: 3.4s; width: 2px; height: 2px; }
+.sp-motes i:nth-child(5) { left: 58%; animation-delay: 2.1s; animation-duration: 7.5s; }
+.sp-motes i:nth-child(6) { left: 66%; animation-delay: 1.6s; width: 3px; height: 3px; animation-duration: 8.5s; }
+.sp-motes i:nth-child(7) { left: 74%; animation-delay: 3s; }
+.sp-motes i:nth-child(8) { left: 83%; animation-delay: 2.3s; width: 2px; height: 2px; animation-duration: 9.5s; }
+.sp-motes i:nth-child(9) { left: 90%; animation-delay: 3.8s; width: 3px; height: 3px; }
+.sp-motes i:nth-child(10) { left: 6%; animation-delay: 2.8s; animation-duration: 8.2s; }
+@keyframes sp-mote {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: .9; }
+  50% { transform: translate(18px, -45vh); }
+  85% { opacity: .5; }
+  100% { opacity: 0; transform: translate(-10px, -90vh); }
+}
+
+/* 略過提示 */
+.sp-hint {
+  position: absolute; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom) + 28px); margin: 0;
+  text-align: center; font-size: 12px; letter-spacing: .3em; color: rgba(255, 250, 244, .7); text-shadow: 0 1px 6px rgba(80, 50, 90, .3);
+  animation: sp-fade-in 1s 1.6s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash *, .splash *::before, .splash *::after { animation: none !important; }
+  .sp-motes { display: none; }
+}

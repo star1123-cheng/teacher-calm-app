@@ -15,6 +15,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="寧靜時光">
+  <link rel="stylesheet" href="css/splash.css">
   <link rel="stylesheet" href="css/base.css">
   <!-- 背景圖提早下載，不用等 CSS 解析完才開始 -->
   <link rel="preload" as="image" href="assets/img/calm-bg-mobile-day.webp" media="(max-width: 768px)">
@@ -36,6 +37,7 @@
   <link rel="modulepreload" href="js/audio-ui.js">
   <link rel="modulepreload" href="js/audio.js">
   <link rel="modulepreload" href="js/bgm.js">
+  <link rel="modulepreload" href="js/splash.js">
   <link rel="modulepreload" href="js/hell.js">
   <link rel="modulepreload" href="js/hell-data.js">
   <link rel="modulepreload" href="js/egg.js">
@@ -45,6 +47,67 @@
   <link rel="modulepreload" href="js/soup.js">
 </head>
 <body>
+<!-- 開場動畫：純 CSS＋SVG，網頁一出現就開始播，同時在背景下載背景音樂 -->
+<div id="splash" class="splash" aria-hidden="true">
+  <div class="sp-sky"></div>
+  <div class="sp-dawn"></div>
+  <div class="sp-glow"></div>
+  <div class="sp-motes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="sp-center">
+    <svg class="sp-mark" viewBox="0 0 320 240" role="img" aria-label="A Moment of Peace">
+      <defs>
+        <radialGradient id="sp-sun-fill" cx="50%" cy="38%" r="62%">
+          <stop offset="0" stop-color="#fffaf0"/>
+          <stop offset=".55" stop-color="#ffdcb4"/>
+          <stop offset="1" stop-color="#f2a98f"/>
+        </radialGradient>
+        <radialGradient id="sp-halo-fill">
+          <stop offset="0" stop-color="#ffd9b8" stop-opacity=".75"/>
+          <stop offset="1" stop-color="#ffd9b8" stop-opacity="0"/>
+        </radialGradient>
+        <clipPath id="sp-above"><rect x="0" y="0" width="320" height="170"/></clipPath>
+        <clipPath id="sp-below"><rect x="0" y="171" width="320" height="69"/></clipPath>
+      </defs>
+      <g class="sp-stars" fill="#fff">
+        <circle cx="52" cy="40" r="1.1"/><circle cx="96" cy="18" r=".8"/><circle cx="262" cy="30" r="1.2"/>
+        <circle cx="236" cy="62" r=".7"/><circle cx="34" cy="96" r=".8"/><circle cx="290" cy="104" r=".9"/>
+      </g>
+      <g class="sp-birds" fill="none" stroke="#fdf3ea" stroke-width="1.3" stroke-linecap="round">
+        <path class="sp-bird" d="M60 74 q4 -3.4 8 0 q4 -3.4 8 0"/>
+        <path class="sp-bird sp-bird-2" d="M80 84 q3 -2.6 6 0 q3 -2.6 6 0"/>
+      </g>
+      <g clip-path="url(#sp-above)">
+        <g class="sp-rise">
+          <circle class="sp-halo" cx="160" cy="138" r="58" fill="url(#sp-halo-fill)"/>
+          <circle cx="160" cy="138" r="27" fill="url(#sp-sun-fill)"/>
+        </g>
+      </g>
+      <g clip-path="url(#sp-below)" class="sp-reflect" fill="#ffd2b0">
+        <rect class="sp-wave" x="128" y="175" width="64" height="2.4" rx="1.2"/>
+        <rect class="sp-wave" x="133" y="182" width="54" height="2.2" rx="1.1" opacity=".8"/>
+        <rect class="sp-wave" x="140" y="189" width="40" height="2" rx="1" opacity=".6"/>
+        <rect class="sp-wave" x="146" y="196" width="28" height="1.8" rx=".9" opacity=".45"/>
+        <rect class="sp-wave" x="152" y="203" width="16" height="1.6" rx=".8" opacity=".3"/>
+        <rect class="sp-wave" x="156" y="209" width="8" height="1.4" rx=".7" opacity=".2"/>
+      </g>
+      <g class="sp-ripples" fill="none" stroke="#fff6ee" stroke-width=".8">
+        <ellipse class="sp-ripple" cx="160" cy="176" rx="36" ry="3.2"/>
+        <ellipse class="sp-ripple" cx="160" cy="176" rx="36" ry="3.2"/>
+        <ellipse class="sp-ripple" cx="160" cy="176" rx="36" ry="3.2"/>
+      </g>
+      <line class="sp-horizon" x1="64" y1="170.5" x2="256" y2="170.5" stroke="#fdf3ea" stroke-width="1" stroke-linecap="round"/>
+      <g class="sp-enso" fill="none" stroke="#fffaf4" stroke-linecap="round">
+        <circle class="sp-ink" cx="199.85" cy="90.51" r="4.2" fill="#fffaf4" stroke="none"/>
+        <path class="sp-stroke sp-stroke-1" pathLength="1" stroke-width="6" d="M 199.85 90.51 A 62 62 0 1 1 165.40 76.24"/>
+        <path class="sp-stroke sp-stroke-2" pathLength="1" stroke-width="2.4" d="M 203.03 95.48 A 60.5 60.5 0 1 1 140.31 82.15"/>
+        <path class="sp-stroke sp-stroke-3" pathLength="1" stroke-width="1.1" d="M 214.08 105.20 A 63.6 63.6 0 1 1 156.78 73.44"/>
+      </g>
+    </svg>
+    <p class="sp-title"><span>A</span> <span>M</span><span>o</span><span>m</span><span>e</span><span>n</span><span>t</span> <span class="it">o</span><span class="it">f</span> <span>P</span><span>e</span><span>a</span><span>c</span><span>e</span></p>
+    <p class="sp-sub">寧靜時光</p>
+  </div>
+  <p class="sp-hint">輕觸畫面略過</p>
+</div>
 <div id="app">
   <div class="flip">
     <div class="flip-inner">

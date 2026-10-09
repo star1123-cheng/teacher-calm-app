@@ -6,7 +6,8 @@ import { openSheet } from './sheet.js';
 
 export const engine = new AudioEngine();
 
-export function initAudio(root = document.getElementById('audio')) {
+// preloadAfter：等這個 Promise 完成（背景音樂下載好）才開始預先載入白噪音，避免搶網路
+export function initAudio({ root = document.getElementById('audio'), preloadAfter = Promise.resolve() } = {}) {
   const settings = getSettings();
   engine.volume = settings.audio.volume;
   // 音檔清單在背景檢查，避免拖慢首頁
@@ -125,6 +126,10 @@ export function initAudio(root = document.getElementById('audio')) {
     if (!files.length) return;
     files.forEach((t) => { tracks.push(t); byId.set(t.id, t); });
     fillTracks();
+    // 上次用的那首排第一個
+    const last = getSettings().audio.lastTrack;
+    const order = [...files].sort((a, b) => (b.id === last) - (a.id === last));
+    preloadAfter.catch(() => {}).then(() => engine.preload(order));
   });
   return { engine, byId };
 }

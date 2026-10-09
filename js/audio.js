@@ -60,8 +60,8 @@ export class AudioEngine {
     this.onChange = () => {};
   }
 
-  // 必須在使用者點擊時呼叫（瀏覽器規定）
-  async ensure() {
+  // 建立播放環境；還沒點擊前建立的會是暫停狀態，但已經可以解碼音檔
+  context() {
     if (!this.ctx) {
       const Ctx = globalThis.AudioContext || globalThis.webkitAudioContext;
       this.ctx = new Ctx();
@@ -69,11 +69,35 @@ export class AudioEngine {
       this.master.gain.value = this.volume;
       this.master.connect(this.ctx.destination);
     }
+    return this.ctx;
+  }
+
+  // 必須在使用者點擊時呼叫（瀏覽器規定）
+  async ensure() {
+    this.context();
     if (this.ctx.state !== 'running') await this.ctx.resume();
   }
 
-  async buffer(track) {
-    if (this.buffers.has(track.id)) return this.buffers.get(track.id);
+  // 開啟 app 後在背景依序把音檔下載並解碼好，第一次按播放就能立刻出聲
+  async preload(tracks) {
+    for (const t of tracks) {
+      try { await this.buffer(t); } catch { /* 下載失敗就等按播放時再試 */ }
+      await new Promise((r) => setTimeout(r, 150)); // 每首之間讓畫面喘口氣
+    }
+  }
+
+  // 同一首只下載解碼一次；預先載入途中按播放，會等同一份結果，不會重複下載
+  buffer(track) {
+    if (!this.buffers.has(track.id)) {
+      const p = this.decode(track);
+      p.catch(() => this.buffers.delete(track.id));
+      this.buffers.set(track.id, p);
+    }
+    return this.buffers.get(track.id);
+  }
+
+  async decode(track) {
+    this.context();
     const res = await fetch(`assets/audio/${track.file}`);
     if (!res.ok) throw new Error('missing');
     const decoded = await this.ctx.decodeAudioData(await res.arrayBuffer());
@@ -81,7 +105,6 @@ export class AudioEngine {
     const fade = Math.min(Math.floor(decoded.sampleRate * 0.25), Math.floor(decoded.length / 4));
     const buf = this.ctx.createBuffer(decoded.numberOfChannels, decoded.length - fade, decoded.sampleRate);
     for (let c = 0; c < decoded.numberOfChannels; c++) buf.copyToChannel(crossfadeLoop(decoded.getChannelData(c), fade), c);
-    this.buffers.set(track.id, buf);
     return buf;
   }
 

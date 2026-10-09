@@ -9,6 +9,7 @@ import { initQuote } from './quote.js';
 import { initNotes } from './notes.js';
 import { initAudio } from './audio-ui.js';
 import { initBgm } from './bgm.js';
+import { initSplash } from './splash.js';
 import { initHell, buildHellForm } from './hell.js';
 import { getHell } from './hell-data.js';
 
@@ -34,8 +35,10 @@ initSettings({ onImported: () => setTimeout(() => location.reload(), 800) });
 initCountdown();
 initQuote();
 initNotes();
-initAudio();
-initBgm();
+// 順序：先下載背景音樂（開場動畫期間），好了再下載白噪音
+const bgm = initBgm();
+initAudio({ preloadAfter: bgm.ready });
+initSplash(bgm.ready);
 initHell();
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
